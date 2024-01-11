@@ -1,0 +1,46 @@
+---
+title: "RMarkdown Practice"
+author: "Liana Williams"
+date: "2024-01-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Title 
+### Title 
+#### Title 
+
+```{r}
+4+5
+```
+
+```{r}
+7-4
+```
+
+```{r}
+4*6
+```
+
+```{r}
+10/2
+```
+
+_liana_
+
+**hello**
+this is  super cool
+
+```{r}
+#install.packages("tidyverse")
+library("tidyverse")
+```
+
+```{r}
+ggplot(mtcars, aes(x = factor(cyl))) +
+    geom_bar()
+```
+
