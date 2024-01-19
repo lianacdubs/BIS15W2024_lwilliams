@@ -3,9 +3,9 @@ title: "Lab 3 Homework"
 author: "Liana Williams"
 date: "`r Sys.Date()`"
 output:
-  html_document:
+  html_document: 
     theme: spacelab
-    toc: no
+    keep_md: true
 ---
 
 ## Instructions
@@ -78,8 +78,6 @@ small_mean
 large_mean <- mean(large$bodywt)
 large_mean
 ```
-
-
 9. Using a similar approach as above, do large or small animals sleep longer on average?  
 
 ```{r}
@@ -98,12 +96,9 @@ On average, small animals sleep longer than large animals based on the data.
 max(sleep$sleep_total)
 ```
 
-
 ```{r}
-filter(sleep, sleep_total==19.9) ######FIX THIS 
+filter(sleep, sleep_total==19.9) 
 ```
-
-
 The sleepiest is the little brown bat at 19.9 hours of sleep. 
 
 ## Push your final code to GitHub!
