@@ -2,10 +2,11 @@
 title: "Transforming data 2: `filter()`"
 date: "`r Sys.Date()`"
 output:
-  html_document:
+  html_document: 
     theme: spacelab
-    toc: yes
-    toc_float: yes
+    toc: true
+    toc_float: true
+    keep_md: true
   pdf_document:
     toc: yes
 ---
@@ -39,7 +40,8 @@ mammals <- rename(mammals, genus=Genus, wean_mass="wean mass", max_life="max. li
 ```
 
 ## `filter()`
-Unlike `select()`, `filter()` allows us to extract data that meet specific criteria within a variable. Let's say that we are interested only in the fish that occur in lake "AL". We can use `filter()` to extract these observations.  
+Unlike `select()`, `filter()` allows us to extract data that meet specific criteria within a variable. Let's say that we are interested only in the fish that occur in lake "AL". We can use `filter()` to extract these observations.
+###Filter allows us to search through a dataframe and pull out observations (rows) of interest. Can be used to explore data of interest and reshape dataframes to focus on certain questions
 ```{r}
 filter(fish, lakeid == "AL") #pull out 383 observations
 ```
