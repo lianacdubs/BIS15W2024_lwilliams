@@ -1,0 +1,50 @@
+---
+title: "Lab_4_WarmUp"
+output: html_document
+date: "2024-01-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#1. Load tidyverse and palmerspenguins libraries
+```{r}
+library("tidyverse")
+```
+
+```{r}
+library("palmerpenguins")
+```
+
+#2. What are the dimensions of the dataset penguins 
+```{r}
+dim(penguins)
+```
+#3.What is the names of the variables in the penguins dataset
+```{r}
+names(penguins)
+```
+Variables are columns 
+
+#4. How many individuals were sampled on each island in the `penguins` dataset?
+```{r}
+penguins <- penguins #Look at the data spreadsheet
+```
+
+```{r}
+table(penguins$island) #variable of interest is island
+```
+
+An alternative way to get it is...
+```{r}
+summary(penguins$island)
+```
+
+#5. What is the mean body mass for all individuals in the `penguins` dataset?
+
+```{r}
+mean(penguins$body_mass_g, na.rm=T) 
+#before adding na.rm=T the output is NA so, you have to do this command to get mean. 
+```
+
