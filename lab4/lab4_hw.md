@@ -1,7 +1,7 @@
 ---
 title: "Lab 4 Homework"
 author: "Liana Williams"
-date: "2024-01-23"
+date: "2024-01-25"
 output:
   html_document: 
     theme: spacelab
@@ -52,7 +52,6 @@ homerange <- readr::read_csv("data/Tamburelloetal_HomeRangeDatabase.csv")
 
 **2. Explore the data. Show the dimensions, column names, classes for each variable, and a statistical summary. Keep these as separate code chunks.**  
 
-
 ```r
 dim(homerange)
 ```
@@ -64,7 +63,6 @@ dim(homerange)
 ```r
 #This code shows the dimensions of the homerange data 
 ```
-
 
 ```r
 names(homerange)
@@ -315,20 +313,90 @@ table(homerange$trophic.guild)
 ##       342       227
 ```
 
-#--------------------------------------------------------STOP FOR 1/24/2024-----------------------
 **7. Make two new data frames, one which is restricted to carnivores and another that is restricted to herbivores.**  
 
+```r
+carnivores <- filter(homerange, trophic.guild == "carnivore")
+herbivores <- filter(homerange, trophic.guild == "herbivore")
+```
 
 **8. Do herbivores or carnivores have, on average, a larger `mean.hra.m2`? Remove any NAs from the data.**  
 
+```r
+mean(herbivores$mean.hra.m2, rm.na=T)
+```
+
+```
+## [1] 34137012
+```
 
 
+```r
+mean(carnivores$mean.hra.m2, rm.na=T)
+```
+
+```
+## [1] 13039918
+```
 
 **9. Make a new dataframe `owls` that is limited to the mean mass, log10 mass, family, genus, and species of owls in the database. Which is the smallest owl? What is its common name? Do a little bit of searching online to see what you can learn about this species and provide a link below** 
 
+```r
+owls <- filter(homerange, order=="strigiformes")
+owls_df <- select(owls, "mean.mass.g", "log10.mass", "family", "genus", "species")
+filter(owls_df, mean.mass.g==61.32) #This finds the specific small owl
+```
+
+```
+## # A tibble: 1 × 5
+##   mean.mass.g log10.mass family    genus      species   
+##         <dbl>      <dbl> <chr>     <chr>      <chr>     
+## 1        61.3       1.79 strigidae glaucidium passerinum
+```
+Answer  
+The smallest owl appears to be the Glaucidium Passerinum, the Eurasian pygmy owl (is the common name).  
+I looked it up and found https://en.wikipedia.org/wiki/Eurasian_pygmy_owl from this the species has spots on its sides and is found in the "boreal forests of Northern and Central Europe to Siberia."
+
+
+```r
+#owls_datf <- select(filter(homerange, order=="strigiformes"), mean.mass.g, log10.preymass, family, genus, species)
+#owls_datf
+#all birds belongs to aves 
+#all owls belong to one order called strigiformes
+#To get the common name I added it to the comma list as common.name,
+```
+#^This was another methods that I found to work
 
 **10. As measured by the data, which bird species has the largest homerange? Show all of your work, please. Look this species up online and tell me about it!**.  
 
+```r
+birds <- filter(homerange, taxon=="birds")
+max(birds$mean.hra.m2)
+```
+
+```
+## [1] 2.41e+08
+```
+
+```r
+filter(birds, mean.hra.m2==2.41e+08)
+```
+
+```
+## # A tibble: 1 × 24
+##   taxon common.name class order         family genus species primarymethod N    
+##   <fct> <chr>       <chr> <fct>         <chr>  <chr> <chr>   <chr>         <chr>
+## 1 birds caracara    aves  falconiformes falco… cara… cheriw… telemetry     26   
+## # ℹ 15 more variables: mean.mass.g <dbl>, log10.mass <dbl>,
+## #   alternative.mass.reference <chr>, mean.hra.m2 <dbl>, log10.hra <dbl>,
+## #   hra.reference <chr>, realm <chr>, thermoregulation <chr>, locomotion <chr>,
+## #   trophic.guild <chr>, dimension <dbl>, preymass <dbl>, log10.preymass <dbl>,
+## #   PPMR <dbl>, prey.size.reference <chr>
+```
+Answer   
+The bird species with the largest homerange is caracara cheriway.  
+https://animaldiversity.org/accounts/Caracara_cheriway/  
+The Caracara cheriway is present along the Mexican American Border from Baja California to Eastern Texas, then south to Panama. Their habitats are comprised of dry prairie with some wetter areas. Cararas have long yellow legs, and a large, hooked, bluish bill.   
 
 ## Push your final code to GitHub!
 Please be sure that you check the `keep md` file in the knit preferences.   

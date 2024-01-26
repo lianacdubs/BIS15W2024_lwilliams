@@ -11,7 +11,7 @@
 
 <meta name="author" content="Liana Williams" />
 
-<meta name="date" content="2024-01-23" />
+<meta name="date" content="2024-01-25" />
 
 <title>Lab 4 Homework</title>
 
@@ -376,7 +376,7 @@ display: none;
 
 <h1 class="title toc-ignore">Lab 4 Homework</h1>
 <h4 class="author">Liana Williams</h4>
-<h4 class="date">2024-01-23</h4>
+<h4 class="date">2024-01-25</h4>
 
 </div>
 
@@ -613,19 +613,63 @@ guild.</strong></p>
 <pre><code>## 
 ## carnivore herbivore 
 ##       342       227</code></pre>
-<p>#——————————————————–STOP FOR 1/24/2024———————– <strong>7. Make two
-new data frames, one which is restricted to carnivores and another that
-is restricted to herbivores.</strong></p>
+<p><strong>7. Make two new data frames, one which is restricted to
+carnivores and another that is restricted to herbivores.</strong></p>
+<pre class="r"><code>carnivores &lt;- filter(homerange, trophic.guild == &quot;carnivore&quot;)
+herbivores &lt;- filter(homerange, trophic.guild == &quot;herbivore&quot;)</code></pre>
 <p><strong>8. Do herbivores or carnivores have, on average, a larger
 <code>mean.hra.m2</code>? Remove any NAs from the data.</strong></p>
+<pre class="r"><code>mean(herbivores$mean.hra.m2, rm.na=T)</code></pre>
+<pre><code>## [1] 34137012</code></pre>
+<pre class="r"><code>mean(carnivores$mean.hra.m2, rm.na=T)</code></pre>
+<pre><code>## [1] 13039918</code></pre>
 <p><strong>9. Make a new dataframe <code>owls</code> that is limited to
 the mean mass, log10 mass, family, genus, and species of owls in the
 database. Which is the smallest owl? What is its common name? Do a
 little bit of searching online to see what you can learn about this
 species and provide a link below</strong></p>
+<pre class="r"><code>owls &lt;- filter(homerange, order==&quot;strigiformes&quot;)
+owls_df &lt;- select(owls, &quot;mean.mass.g&quot;, &quot;log10.mass&quot;, &quot;family&quot;, &quot;genus&quot;, &quot;species&quot;)
+filter(owls_df, mean.mass.g==61.32) #This finds the specific small owl</code></pre>
+<pre><code>## # A tibble: 1 × 5
+##   mean.mass.g log10.mass family    genus      species   
+##         &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt;     &lt;chr&gt;      &lt;chr&gt;     
+## 1        61.3       1.79 strigidae glaucidium passerinum</code></pre>
+<p>Answer<br />
+The smallest owl appears to be the Glaucidium Passerinum, the Eurasian
+pygmy owl (is the common name).<br />
+I looked it up and found <a href="https://en.wikipedia.org/wiki/Eurasian_pygmy_owl" class="uri">https://en.wikipedia.org/wiki/Eurasian_pygmy_owl</a> from
+this the species has spots on its sides and is found in the “boreal
+forests of Northern and Central Europe to Siberia.”</p>
+<pre class="r"><code>#owls_datf &lt;- select(filter(homerange, order==&quot;strigiformes&quot;), mean.mass.g, log10.preymass, family, genus, species)
+#owls_datf
+#all birds belongs to aves 
+#all owls belong to one order called strigiformes
+#To get the common name I added it to the comma list as common.name,</code></pre>
+<p>#^This was another methods that I found to work</p>
 <p><strong>10. As measured by the data, which bird species has the
 largest homerange? Show all of your work, please. Look this species up
 online and tell me about it!</strong>.</p>
+<pre class="r"><code>birds &lt;- filter(homerange, taxon==&quot;birds&quot;)
+max(birds$mean.hra.m2)</code></pre>
+<pre><code>## [1] 2.41e+08</code></pre>
+<pre class="r"><code>filter(birds, mean.hra.m2==2.41e+08)</code></pre>
+<pre><code>## # A tibble: 1 × 24
+##   taxon common.name class order         family genus species primarymethod N    
+##   &lt;fct&gt; &lt;chr&gt;       &lt;chr&gt; &lt;fct&gt;         &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;
+## 1 birds caracara    aves  falconiformes falco… cara… cheriw… telemetry     26   
+## # ℹ 15 more variables: mean.mass.g &lt;dbl&gt;, log10.mass &lt;dbl&gt;,
+## #   alternative.mass.reference &lt;chr&gt;, mean.hra.m2 &lt;dbl&gt;, log10.hra &lt;dbl&gt;,
+## #   hra.reference &lt;chr&gt;, realm &lt;chr&gt;, thermoregulation &lt;chr&gt;, locomotion &lt;chr&gt;,
+## #   trophic.guild &lt;chr&gt;, dimension &lt;dbl&gt;, preymass &lt;dbl&gt;, log10.preymass &lt;dbl&gt;,
+## #   PPMR &lt;dbl&gt;, prey.size.reference &lt;chr&gt;</code></pre>
+<p>Answer<br />
+The bird species with the largest homerange is caracara cheriway.<br />
+<a href="https://animaldiversity.org/accounts/Caracara_cheriway/" class="uri">https://animaldiversity.org/accounts/Caracara_cheriway/</a><br />
+The Caracara cheriway is present along the Mexican American Border from
+Baja California to Eastern Texas, then south to Panama. Their habitats
+are comprised of dry prairie with some wetter areas. Cararas have long
+yellow legs, and a large, hooked, bluish bill.</p>
 </div>
 <div id="push-your-final-code-to-github" class="section level2">
 <h2>Push your final code to GitHub!</h2>
