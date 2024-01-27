@@ -27,6 +27,7 @@ library("tidyverse")
 ## Load the data
 These data are from: Gaeta J., G. Sass, S. Carpenter. 2012. Biocomplexity at North Temperate Lakes LTER: Coordinated Field Studies: Large Mouth Bass Growth 2006. Environmental Data Initiative.  [link](https://portal.edirepository.org/nis/mapbrowse?scope=knb-lter-ntl&identifier=267)  
 ```{r}
+
 fish <- readr::read_csv("data/Gaeta_etal_CLC_data.csv")
 ```
 #readr is explicit of the package we are use. the code will work without this. readr is apart of tidyverse. 
@@ -36,7 +37,7 @@ Once data have been uploaded, let's get an idea of its structure, contents, and 
 ```{r}
 glimpse(fish)
 ```
-there are 4,033 variables and 6 variables 
+there are 4,033 observations and 6 variables 
 
 ```{r}
 summary(fish)

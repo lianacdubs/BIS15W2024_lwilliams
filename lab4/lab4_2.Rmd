@@ -63,7 +63,7 @@ Filtering multiple values within the same variable requires the `%in%` [operator
 ```{r}
 filter(fish, length %in% c(167, 175))
 #within the variable length all those with length 167 or 175
-#multiple values in teh same variable %n% 
+#multiple values in the same variable %n% 
 ```
 
 Alternatively, you can use `between` if you are looking for a range of specific values.  
@@ -81,26 +81,28 @@ filter(fish, near(radii_length_mm, 2, tol = 0.2))
 ## Practice
 1. Filter the `fish` data to include the samples from lake "BO".
 ```{r}
-
+filter(fish, lakeid=="BO")
+#Just shows the BO samples
 ```
 
 2. Filter the data to include all lakes except "AR".
 ```{r}
-
+filter(fish, lakeid != "AR")
+#shows all the lakeids except for AR
 ```
 
 3. Filter the fish data to include all fish with a scalelength within 0.25 of 8.
 ```{r}
-
+filter(fish, near(scalelength, 8, tol=0.25))
 ```
 
 4. Filter the fish data to include fish with a scalelength between 2 and 4.
 ```{r}
-
+filter(fish, between(scalelength, 2, 4))
 ```
 
 ```{r}
-
+filter(fish, scalelength %in% c(2,4))
 ```
 
 ## Using `filter()` on multiple conditions
@@ -124,21 +126,21 @@ In this case, we filter out the fish with a length over 400 and a scale length o
 ```{r}
 filter(fish, length > 400, (scalelength > 11 | radii_length_mm > 8))
 ```
-
+----------
 ## Practice  
 1. Have a look at the mammals data using the summary `functions` of your choosing.    
 ```{r}
-
+glimpse(mammals)
 ```
 
 2. What are the names of the variables in the mammals data?  
 ```{r}
-
+names(mammals)
 ```
 
 3.  From the `mammals` data, filter all members of the family Bovidae with a mass greater than 450000.
 ```{r}
-
+Bovidae <- filter(mammals, mass>450000)
 ```
 
 4. Let's say we are only interested in family, genus, species, mass, and gestation. Relimit the mammals data frame to these variables.  

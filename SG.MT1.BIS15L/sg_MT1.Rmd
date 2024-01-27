@@ -7,7 +7,7 @@ date: "2024-01-27"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+Note: This study guide doesn't include the HW! 
 #Lab 1 
 class repository "datascibiol" (https://github.com/jmledford3115/datascibiol)**Star**
 [R cheatsheets](https://posit.co/resources/cheatsheets/)
@@ -143,3 +143,100 @@ We can also 'View()' in the environment panel
 Filter is a way of pulling out observations that meet specific criteria in a variable. (More in lab 4).   
 Observations are in a cell of the spreadsheet  
 
+##Lab 4    
+##4.1   
+Note: Data frames are more detailed than a data matrix.  
+**read** (is the command) to IMPORT csv  
+**write** (is the command) to EXPORT csv
+## We will be working on tidyverse
+### Once installed then do library("tidyverss")  
+##Load the data  
+fish <- readr::read_csv("data/Gaeta_etal_CLC_data.csv")
+##readr is ecplicit of the package we are using. the code would work without this. 
+**Every variable(vertical) is own column**  
+**Every observation(horizontal) in own row**  
+**Each (cell) has one value**  
+## refer to the warm up for practice of lab 3 using tables, na function, and $ finction
+## dplyr
+The first package that we will use that is part of the tidyverse is `dplyr`. `dplyr` is used to transform data frames by extracting, rearranging, and summarizing data such that they are focused on a question of interest. Good for large data. The two functions we will use most are `select()` and `filter()`.  
+Takes a data frame and then, chops it up how you want then, makes it tidy.  
+## `select()`
+Select allows you to pull out columns aka variables of interest from a dataframe. To do this, just add the names of the columns to the `select()` command. The order in which you add them, will determine the order in which they appear in the output.  
+**Select doesn't allow us to extract observations from within the dataframe** 
+
+We are only interested in lakeid and scalelength.
+```{r}
+select(fish, "lakeid", "scalelength") #(name of data frame which is an object, variable1 of interst, variable2 of interest)
+```
+In the above example the data frame is chopped up vertically. It shows column for lakeid and column for scalelength.  
+### if you reverse the order of variable it changes the order in the table
+###you can also create an object by some_name <- _inserttheselectfunction_
+To add a range of columns use `start_col:end_col`.
+```{r}
+select(fish, fish_id:length)
+```
+
+The **-** operator is useful in select. It allows us to select everything except the specified variables.
+```{r}
+select(fish, -"fish_id", -"annnumber", -"length", -"radii_length_mm")
+#Pulls out all the variables that are not the ones listed. another explanation is excludes the ones listed (doesn't show those in data)
+```
+'contains()'  
+```{r}
+select(fish, contains("length"))
+#look into the fish data and remove everything that has to do with length
+```
+
+When columns are sequentially named, `starts_with()` makes selecting columns easier.
+```{r}
+select(fish, starts_with("radii"))
+#pull out all the variables that start with the name radii
+```
+
+#These are the most common! 
+Options to select columns based on a specific criteria include:  
+1. ends_with() = Select columns that end with a character string  
+2. contains() = Select columns that contain a character string  
+3. matches() = Select columns that match a regular expression  (regex)
+4. one_of() = Select columns names that are from a group of names  
+
+## You can select columns based on class of data
+```{r}
+select_if(fish, is.numeric)
+```
+To select all columns that are *not* a class of data, you need to add a `~`.
+```{r}
+select_if(fish, ~!is.numeric(.)) 
+#look into fish and pull things that are not numerics. 
+#~ is all cells ! is DONT pull out the ones that are not numeric 
+# ! = not 
+```
+
+#The practice 
+##shows how to load the data, access structure, find NAs, names of the columns, rename the columns (new name= old name), select to build a new dataframe to include variables of interest, using the - operator to exclude variables, select columns using contain, select all columns that are of class)  
+### Other features include jantor (which is a package) + running it, tolower(), toupper(), and code to remove blanks    
+
+#Lab 4.2  
+**The `filter()` function allows us to extract data that meet specific criteria.**  
+## `filter()`
+Unlike `select()`, `filter()` allows us to extract data that meet specific criteria within a variable. Let's say that we are interested only in the fish that occur in lake "AL". We can use `filter()` to extract these observations.
+###Filter allows us to search through a dataframe and pull out observations (rows) of interest. Can be used to explore data of interest and reshape dataframes to focus on certain questions  
+`filter()` allows all of the expected operators; i.e. >, >=, <, <=, != (not equal), and == (equal).  
+Using the `!` operator allows for the exclusion of specific observations  
+## Using `filter()` with multiple observations  
+Filtering multiple values within the same variable requires the `%in%`
+Alternatively, you can use `between` if you are looking for a range of specific values.
+You can also extract observations "near" a certain value but you need to specify a tolerance.  
+## Practice
+1. Filter the `fish` data to include the samples from lake "BO".
+2. Filter the data to include all lakes except "AR".
+3. Filter the fish data to include all fish with a scalelength within 0.25 of 8.
+4. Filter the fish data to include fish with a scalelength between 2 and 4.  
+## Using `filter()` on multiple conditions
+You can also use `filter()` to extract data based on multiple conditions. 
+& and | operators  
+Rules:  
++ `filter(condition1, condition2)` will return rows where both conditions are met.  
++ `filter(condition1, !condition2)` will return all rows where condition one is true but condition 2 is not.  
++ `filter(condition1 | condition2)` will return rows where condition 1 or condition 2 is met.  
++ `filter(xor(condition1, condition2)` will return all rows where only one of the conditions is met, and not when both conditions are met. 
