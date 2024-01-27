@@ -62,11 +62,13 @@ make an html file "builds a file"
 ##To get help with a command 
 ?**command name**
 
+To install.packages(_insertnameofpackage_)  
+once installed then, library(_nameofpackage_)
 #Lab2 
 Assign a value to object 'x'. The '<-' symbol is read as 'gets'. In this case, x gets 42. Make sure that you are in the environment panel and you should see the value associated with 'x'. On a mac, you can push `option` and `-` to automatically generate the gets symbol.  
 ##2.1 Objects, Nomenclature, Types of Data, Missing Data
 -Don't assign names to objects that are the same as functions in R 
---There are five frequently used `classes` of data: 1. numeric, 2. integer(L notates an integer), 3. character(""), 4. logical(TRUE or FALSE), 5. complex.
+*There are five frequently used `classes` of data: 1. numeric, 2. integer(L notates an integer), 3. character(""), 4. logical(TRUE or FALSE), 5. complex.*
 To find out what type of data you are working with, use the `class()` function.
 You can use the `is()` and `as()` functions to clarify or specify a type of data.
 ```{r}
@@ -89,6 +91,7 @@ mean(new_vector, na.rm=T) #na.rm removes the NA values in the vector
 ##2.2 
 Data Structures: include vectors, lists, matrices, dataframes, and factors 
 **vectors** create vectors using the 'c' command which means concatenate. 
+*A vector is a list of variables, and the simplest data structure in R*  
 --We can **identify vector elements** with the [], you only get the values, not the logical evaluation of the entire vector.
 **Data Matrices**: series of stacked vectors, similar to a data table. 
 Name the columns using `colnames()` with the vector region.
@@ -101,3 +104,42 @@ Adding a colon `:` selects the specified elements in a column.
 
 
 #Lab 3 
+???????? For the warm up when we were making the matrix. How do you know it by nrow =5 and byrow = F? What do those functions do?
+--can you review when you would do colmeans vs rowmeans???
+Vectors can be organized into a new data structure called **data frames**. 
+Data frames are similar to a spreadsheet. It can store data of many different classes. ?????????Can a data matrix only do one type of class?  
+##3.1 
+Ex: Combine our three vectors to create a data frame with the function `data.frame()`.  
+Data Frames show the class of data.
+'names()' gives the column names of the vector  
+'dim()' gives the dimensions
+'str()' gives the structure; this gives the structure where each variable(column) is NOW a row, an observation is what goes in a cell.
+`dbl` means that the value is a type of numeric [double precision floating point](http://uc-r.github.io/integer_double/).  
+We can change the name in a dataframe by (new_name=Old_name) the data in the dataframe is overwritten so it now appears as new_name for the variable. 
+## Accessing Data Frame Columns and Rows 
+The same methods of selecting elements in vectors and data matrices apply to data frames. We use `[]`. We have two positions where the first applies to the rows, and the second to the columns.  
+Ex: hbirds[1,] means first row; if [,3] then, 3rd column.
+We can also select values in an entire column using the `$` sign.  
+We can add a new bird's data with the `rbind()` function, known as row bind. It will bind our new vector to our data frame row-wise.
+## Writing Data to File  
+.csv is comma separated values (data type that can be imported into R)
+
+##3.2 
+1. Import .csv files as data frames using `read_csv()`.  
+##Load the Data 
+Since we are using the tidyverse, we open the file using `read_csv()`. `readr` is included in the tidyverse set of packages. We specify the package and function with the `::` symbol. This becomes important if you have multiple packages loaded that contain functions with the same name. 
+A **factor** has discrete levels (there is a max. amount). 
+## Summary functions
+We can summarize our data frame with the`summary()` function.  
+`glimpse()` is another useful summary function.  
+`nrow()` gives the numbers of rows.  
+`ncol` gives the number of columns.  
+`names` gives the column names.  
+`head()` prints the first n rows of the data frame.  
+`tail()` prinst the last n rows of the data frame.  
+`table()` is useful when you have a limited number of categorical variables. It produces fast counts of the number of observations in a variable. We will come back to this later...   
+We can also 'View()' in the environment panel  
+## Filter
+Filter is a way of pulling out observations that meet specific criteria in a variable. (More in lab 4).   
+Observations are in a cell of the spreadsheet  
+

@@ -164,6 +164,7 @@ hsprings
 4. Calculate the mean temperature of all of the temperature measurements.
 ```{r}
 temp <- hsprings[,1] #same command as data matrix
+#all the temps are in column 1 
 temp
 mean(temp)
 ```
