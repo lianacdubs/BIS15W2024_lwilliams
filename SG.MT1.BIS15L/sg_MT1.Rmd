@@ -1,0 +1,103 @@
+---
+title: "study_guide_mt1"
+output: html_document
+date: "2024-01-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Lab 1 
+class repository "datascibiol" (https://github.com/jmledford3115/datascibiol)**Star**
+[R cheatsheets](https://posit.co/resources/cheatsheets/)
+-GitHub is a file storage and management site used by programmers. The software Git uses version control. 
+--Programmers upload code to **repositories(folders)** and make it publicly avail.
+-GitHub desktop is an easy way to manage GitHub repository. 
+## Clone Your Repository  
+In GitHub desktop, you will see your personal repository as an option under `clone repository`. Clone your repository to the desktop. Once you have done this any changes you make to files will be recorded and easily uploaded. Do not move this folder from your desktop. 
+## Copy the Class Repository
+You do this by navigating to the repository then going to the small green code button at top right. Click on the code button then go to Download ZIP.  
+-Terms to Define: 
+1. `Commit` takes a snapshot of your current progress.    
+2. `Pull` this is the same as download.     
+3. `Push` this is the same as upload.  
+Clicking the `Commit to master` button in the bottom left corner means that you are recording a snapshot of your edits locally. Once this is done, you need to upload your changes to GitHub. This is done by clicking `Push origin`. Once you have pushed your changes you can double check by looking at your repository on github.com.    
+## R and RStudio
+R is an open source, **scripting** language. 
+--therefore, write instructiongs used by the computer to complete an operation.
+---no typos, punctuation errors, errant spaces, or other types of mistakes. 
+RStudio is a GUI that is used to interact with R. 
+-**working directory** is the location on your computer where you are currently working. (Place where R studio will save all your work.)
+```{r}
+getwd() #if not in correct wd then, Session>Set Working Directory>Choose Directory>Desktop>
+```
+In R '>' is where commands are entered. 
+##Arithmetic
+Order of operations applies. No need for = 
+-Making a **vector** aka string of values to store an an object then we can perform stats on the object. 
+--'Objects' in R are a way in which we can store data or operations. 
+## RMarkdown Basics 
+Document read in R Studio. 
+**Why use R Markdown**. 
+Transparency in experimental methodology, observation, collection of data and analytical methods.
+Public availability and re-usability of scientific data.
+Public accessibility and transparency of scientific communication.
+Using web-based tools to facilitate scientific collaboration.
+###Titles and Text
+'#' is used for tittles 
+-The more hashtags = smaller font
+--Text with no '#' is smallest and not bold. 
+_italics_
+**bold**
+line break is indiacated. 
+by two spaces. 
+###Links
+'[]' for name of the webpage and '()' for website address. 
+For emails you need to include 'malito:' in parenthesis. [Liana Williams](malito:lcwilliams@ucdavis.edu)
+###Code chunks 
+ "Insert>R" at the top of the page. On a Mac, the shortcut is `option+command+i`.  
+###Knit 
+make an html file "builds a file" 
+##To get help with a command 
+?**command name**
+
+#Lab2 
+Assign a value to object 'x'. The '<-' symbol is read as 'gets'. In this case, x gets 42. Make sure that you are in the environment panel and you should see the value associated with 'x'. On a mac, you can push `option` and `-` to automatically generate the gets symbol.  
+##2.1 Objects, Nomenclature, Types of Data, Missing Data
+-Don't assign names to objects that are the same as functions in R 
+--There are five frequently used `classes` of data: 1. numeric, 2. integer(L notates an integer), 3. character(""), 4. logical(TRUE or FALSE), 5. complex.
+To find out what type of data you are working with, use the `class()` function.
+You can use the `is()` and `as()` functions to clarify or specify a type of data.
+```{r}
+is.integer(my_numeric) #is my_numeric an integer?
+```
+
+```{r}
+my_integer <- 
+  as.integer(my_numeric) #create a new object specified as an integer
+```
+
+```{r}
+is.integer(my_integer) #is my_numeric an integer?
+```
+NA values are used to designate missing data. `is.na` or `anyNA` are useful functions when dealing with NAs in data.
+-Tells TRUE or FALSE 
+```{r}
+mean(new_vector, na.rm=T) #na.rm removes the NA values in the vector
+```
+##2.2 
+Data Structures: include vectors, lists, matrices, dataframes, and factors 
+**vectors** create vectors using the 'c' command which means concatenate. 
+--We can **identify vector elements** with the [], you only get the values, not the logical evaluation of the entire vector.
+**Data Matrices**: series of stacked vectors, similar to a data table. 
+Name the columns using `colnames()` with the vector region.
+Name the rows using `rownames()` with the vector titles.
+`cbind()` adds columns.
+Adding a colon `:` selects the specified elements in a column.  
+
+????????????Question to ask in OH; in 2.2. is it read row on the left column on the right? in #a few extras I am confused. 
+- if you want the entire column do something like [ ,2] which pulls out all of coumn 2 (look vertically?)
+
+
+#Lab 3 
