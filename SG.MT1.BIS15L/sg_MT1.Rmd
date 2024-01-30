@@ -99,15 +99,20 @@ Name the rows using `rownames()` with the vector titles.
 `cbind()` adds columns.
 Adding a colon `:` selects the specified elements in a column.  
 
-????????????Question to ask in OH; in 2.2. is it read row on the left column on the right? in #a few extras I am confused. 
+row on the left column on the right? 
 - if you want the entire column do something like [ ,2] which pulls out all of coumn 2 (look vertically?)
 
 
 #Lab 3 
-???????? For the warm up when we were making the matrix. How do you know it by nrow =5 and byrow = F? What do those functions do?
---can you review when you would do colmeans vs rowmeans???
+For the warm up when we were making the matrix. How do you know it by nrow =5 and byrow = F? What do those functions do?
+- Byrow if you want to fill in horizontal (T) 
+-bycolmn  if fill top to bottom. (F)
+--can you review when you would do colmeans (vertical)vs rowmeans(horizontal)???
 Vectors can be organized into a new data structure called **data frames**. 
-Data frames are similar to a spreadsheet. It can store data of many different classes. ?????????Can a data matrix only do one type of class?  
+Data frames are similar to a spreadsheet. It can store data of many different classes. 
+
+matrix only have one class. 
+data frame can have multiple classes each column can have a different class
 ##3.1 
 Ex: Combine our three vectors to create a data frame with the function `data.frame()`.  
 Data Frames show the class of data.
