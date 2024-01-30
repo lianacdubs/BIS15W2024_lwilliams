@@ -1,0 +1,80 @@
+---
+title: "lab6_warmup"
+output: html_document
+date: "2024-01-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load the libraries 
+```{r}
+library("tidyverse")
+library("janitor")
+```
+
+# 1. Load the data 
+```{r}
+bison <- readr::read_csv("data/bison.csv")
+```
+# 2. Dimensions and structure of the data? 
+```{r}
+dim(bison) #Dimensions
+```
+
+```{r}
+glimpse(bison) #structure of the data
+```
+Note: dbl is double floating point therefore its a number. 
+
+#3. We are interested in code, sex, weight, year of birth. Restrict the data to these variables and store the dataframe as a new object. 
+```{r}
+#bison_new <- select(bison, "animal_code", "animal_sex", "animal_weight", "animal_yob")
+#this way works but, prof wants to use pipes
+```
+
+```{r}
+bison_new <- bison %>%
+  select(animal_code, animal_sex, animal_weight, animal_yob)
+```
+
+#4. Pull out the animals born between 1980-1990 
+```{r}
+#filter(bison, between(animal_yob, 1980, 1990)) #pull all observations for animal_yob 1980-1990
+#this way works 
+```
+ˆ
+```{r}
+bison_new %>%
+  filter(animal_yob>=1980 & animal_yob<=1990)
+```
+
+#5. How many male and female bison are represented betwen 1980-1990?
+```{r}
+males <- bison_new %>% #first pull out the males 
+  filter(animal_yob>=1980 & animal_yob<=1990) %>%
+  filter(animal_sex=="M")
+males #there are 21 males based on variables in the table. 
+
+table(males$animal_sex)
+```
+```{r}
+females <- bison_new %>% #first pull out the females 
+  filter(animal_yob>=1980 & animal_yob<=1990) %>%
+  filter(animal_sex=="F")
+females # 
+
+table(females$animal_sex) #There are 414 females 
+```
+
+
+#6. Between 1980-1990, were males or females larger on average
+```{r}
+mean(males$animal_weight)
+```
+
+```{r}
+mean(females$animal_weight)
+```
+

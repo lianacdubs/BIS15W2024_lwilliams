@@ -235,7 +235,7 @@ You can also extract observations "near" a certain value but you need to specify
 ## Practice
 1. Filter the `fish` data to include the samples from lake "BO".
 2. Filter the data to include all lakes except "AR".
-3. Filter the fish data to include all fish with a scalelength within 0.25 of 8.
+3. Filter the fish data to include all fish with a scalelength within 0.25 of
 4. Filter the fish data to include fish with a scalelength between 2 and 4.  
 ## Using `filter()` on multiple conditions
 You can also use `filter()` to extract data based on multiple conditions. 
@@ -245,3 +245,11 @@ Rules:
 + `filter(condition1, !condition2)` will return all rows where condition one is true but condition 2 is not.  
 + `filter(condition1 | condition2)` will return rows where condition 1 or condition 2 is met.  
 + `filter(xor(condition1, condition2)` will return all rows where only one of the conditions is met, and not when both conditions are met. 
+
+
+###INCLUDE STUFF ON THE HOMEWORK AND WARMUPS FROM EACH LAB! 
+
+#Lab 5.1 
+#Lab 5.2 
+#Lab 6.1
+#Lab 6.2 

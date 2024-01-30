@@ -1,0 +1,11 @@
+---
+title: "code_MT1"
+output: html_document
+date: "2024-01-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#This document includes all the examples from the code we have done. 
