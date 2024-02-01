@@ -1,6 +1,7 @@
 ---
 title: "dplyr Superhero"
 date: "`r Sys.Date()`"
+author: "Liana Williams"
 output:
   html_document: 
     theme: spacelab
