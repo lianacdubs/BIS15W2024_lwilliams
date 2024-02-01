@@ -247,9 +247,86 @@ Rules:
 + `filter(xor(condition1, condition2)` will return all rows where only one of the conditions is met, and not when both conditions are met. 
 
 
-###INCLUDE STUFF ON THE HOMEWORK AND WARMUPS FROM EACH LAB! 
+**A little note on Pipe**
+ %>% "and then"
+Pipe allows for a series of sequential functions to be applied to an object. 
+```{r}
+wakeup(self) %>% 
+  put_on("clothes") %>% 
+  eat("breakfast") %>% 
+  go(to = "work")
+```
 
+```{r}
+#If performing the steps multiple times then assign it to an object. 
+morning_routine <- wakeup(self) %>% 
+  put_on("clothes") %>% 
+  eat("breakfast") %>% 
+  go(to = "work")
+```
+
+The tidyverse is a series of packages that allows you to more easily perform the steps of data science. 
+#Lab 5 introduction 
+1. What is the association between the tidyverse, dplyr, select, and filter?  
+#The main package is tidyverse within that is the package dplyr and select and filter are functions in it. 
+2. Describe how `select ()` can be used to transform data frames.  
+#Select allows you to select columns(variables) of interest (works vertically)
+3. Describe how `filter ()` can be used to transform data frames. 
+#filter can be used to filter out specific values (works horizontal in rows)
 #Lab 5.1 
+The janitor package cleans up the data (e.g. makes all capital letters lowercase)
+#Factors show how many categories there are in a variable. They are a data type to use when you know a certain variable will have repeated values. So when you take the levels of a factor, you are shown all the different levels (values). 
+```{r}
+# Looking at tropic_guild (variable) it has two values (herbivor or carnivore)
+```
+#You can use 'filter()' on multiple conditions.
+#The `|` operator is inclusive 
+
+Rules:  
++ `filter(condition1, condition2)` will return rows where both conditions are met.  
++ `filter(condition1, !condition2)` will return all rows where condition one is true but condition 2 is not.  
++ `filter(condition1 | condition2)` will return rows where condition 1 or condition 2 is met.  
++ `filter(xor(condition1, condition2)` will return all rows where only one of the conditions is met, and not when both conditions are met.  
+```{r}
+#In this case, we filter out the fish with a length over 400 AND a scale length over 11 OR a radii length over 8.
+
+#filter(fish, length > 400, (scalelength > 11 | radii_length_mm > 8))
+```
+
 #Lab 5.2 
-#Lab 6.1
-#Lab 6.2 
+Pipes %>%  allow us to combine 'select()', 'filter()' and other functions efficently. Pipes feed the output from one function into the input of another function. 
+
+On MAC: shift,command,m
+^^ How to make a pipe!  
+
+'arrange()' command is like a SORT command in excel. The default is in ascending order.   
+To sort in decreasing order, wrap the variable name in `desc()`.  
+
+`mutate()`  
+Mutate allows us to create a new column from existing columns in a data frame.  
+
+`mutate_all()`
+This last function is super helpful when cleaning data.  
+
+Here is an example that changes all entries to lowercase (if present).  
+
+Using the across function we can specify individual columns.  
+
+With `ifelse()`, you first specify a logical statement, afterwards what needs to happen if the statement returns `TRUE`, and lastly what needs to happen if it's  `FALSE`.  
+-use if_else to allow to use the 'mutate' function but, not have the entire column affected in the same way. this is similar to find and replace. 
+
+
+#Lab 6.1  
+The characteristics of 'tidy' data are...
+Each column is a variable  
+Each row is an observation  
+Each cell is a value  
+
+For mutate we won't have to create a new object!  
+For cleannames it only works for column names! 
+
+
+Practice on mutate(), mutate_all(), across function, if_else()
+
+#Lab 6.2  
+The 'janitor' package has the function 'tabyl()' which produces counts and percentages.

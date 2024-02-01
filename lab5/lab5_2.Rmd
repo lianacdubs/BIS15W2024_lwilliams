@@ -43,6 +43,10 @@ Let's rename some of the `mammals` variables.
 mammals <- rename(mammals, genus="Genus", wean_mass="wean mass", max_life= "max. life", litter_size="litter size", litters_per_year="litters/year")
 ```
 
+```{r}
+#mammals <- clean_names(mammals)
+```
+
 ## Pipes `%>%` 
 In order to start combining `select()`, `filter()`, and other functions efficiently, we need to learn pipes. Pipes feed the output from one function into the input of another function. This helps us keep our code sequential and clean.  
 
@@ -107,7 +111,7 @@ fish %>%
 1. We are interested in the radii length and scalelength of fish with the id `300`. Extract this information from the `fish` data. Please sort the data by radii length.
 ```{r}
 fish %>% 
-  select(fish_id, radii_length_mm, scalelength) %>% 
+  select(fish_id, radii_length_mm, scalelength) %>% #Three variables of interest
   filter(fish_id == 300) %>% 
   arrange(radii_length_mm)
 ```
@@ -152,16 +156,6 @@ mammals %>%
   arrange(newborn)
 ```
 
-## Practice
-1. Use `mutate()` to make a new column that is the half length of each fish: length_half = length/2. Select only fish_id, length, and length_half.
-```{r}
-
-```
-
-2. We are interested in the family, genus, species and max life variables. Because the max life span for several mammals is unknown, the authors have use -999 in place of NA. Replace all of these values with NA in a new column titled `max_life_new`. Finally, sort the date in descending order by max_life_new. Which mammal has the oldest known life span?
-```{r}
-
-```
 
 ## That's it! Let's take a break and then move on to part 2! 
 

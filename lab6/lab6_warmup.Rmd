@@ -59,6 +59,7 @@ males #there are 21 males based on variables in the table.
 
 table(males$animal_sex)
 ```
+
 ```{r}
 females <- bison_new %>% #first pull out the females 
   filter(animal_yob>=1980 & animal_yob<=1990) %>%

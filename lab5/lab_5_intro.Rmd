@@ -41,9 +41,10 @@ You will need the tidyverse to complete the warm-up- be sure to load the library
 
 1. Load the fish data. 
 ## Load the tidyverse
-```{r message=FALSE, warning=FALSE}
+```{r}
 library(tidyverse)
 ```
+
 
 ##Load the fish data 
 ```{r}

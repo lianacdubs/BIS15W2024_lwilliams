@@ -46,3 +46,19 @@ Get Started in R, RStudio, GitHub
  
 1. Use the functions of dplyr (filter, select, arrange) to organize and sort data frames.    
 2. Use `mutate()` to calculate a new column from existing columns.   
+## Lab 5.1  
+  
+1. Use `filter()` to extract variables of interest.  
+2. Use `filter()` to extract variables of interest under multiple conditions. 
+## Lab 5.2  
+
+1. Use pipes to connect functions in dplyr.  
+2. Use `arrange()` to order dplyr outputs.  
+3. Use `mutate()` to add columns in a dataframe.  
+4. Use `mutate()` and `if_else()` to replace values in a dataframe. 
+## Lab 6.1  
+1. Use `mutate()` to add columns in a dataframe.  
+2. Use `mutate()` and `if_else()` to replace values in a dataframe.  
+## Lab 6.2  
+1. Develop your dplyr superpowers so you can easily and confidently manipulate dataframes.  
+2. Learn helpful new functions that are part of the `janitor` package.  
