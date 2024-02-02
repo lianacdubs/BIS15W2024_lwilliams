@@ -1,6 +1,7 @@
 ---
 title: "summarize practice, `count()`, `across()`"
 date: "`r Sys.Date()`"
+author: Liana Williams 
 output:
   html_document:
     theme: spacelab
@@ -16,7 +17,7 @@ output:
 2. Use the `across()` operator to produce summaries across multiple variables.  
 
 
-####FIX THE CODE SO IT MATCHES THE PROFS###
+
 
 ## Load the libraries
 ```{r message=FALSE, warning=FALSE}
@@ -40,7 +41,11 @@ levels(penguins$island) #This tells us there are three islands. island is a fact
 ```{r}
 penguins %>% 
   group_by(island) %>% 
-  summarize(mean_body_mass=mean(body_mass_g))
+  summarize(mean_body_mass=mean(body_mass_g),
+            mean_bill_l=mean(bill_length_mm),
+            mean_bill_d=mean(bill_depth_mm),
+            mean_flip=mean(flipper_length_mm),
+            na.rm=TRUE)
 ```
 
 **On which island is body mass highest** (Potential midterm question)
@@ -57,7 +62,11 @@ penguins %>%
 Well, that won't work so let's remove the NAs and recalculate.
 ```{r}
 penguins %>% 
-  filter(!is.na(body_mass_g)) %>% #pull out all the observations that have a number and leave all the NAs behind. 
+  group_by(island) %>% 
+  filter(!is.na(body_mass_g)) %>% 
+  summarize(mean_body_mass=mean(body_mass_g),
+            n=n()) #n=n() gives you total count
+#pull out all the observations that have a number and leave all the NAs behind. 
   
 ```
 
@@ -108,12 +117,27 @@ penguins %>%
   summarize(mean_bill_length_mm=mean(bill_length_mm, na.rm = T))
 ```
 
+```{r}
+penguins %>% 
+  group_by(species) %>% 
+  filter(!is.na(bill_length_mm)) %>% 
+  summarize(mean_blm=mean(bill_length_mm))
+```
+Chinstrap > Gentoo > Adelie
+
 2. For some penguins, their sex is listed as NA. Where do these penguins occur?
 ```{r}
 penguins %>% 
   count(sex, island)
 ```
 some observations on each island where it hasn't been recorder. there could have been some problem recording the data. 
+
+```{r}
+#penguins %>% 
+  #filter(is.na(sex)) %>% 
+  #count(island, sex)
+```
+
 
 ## `across()`
 What about using `filter()` and `select()` across multiple variables? There is a function in dplyr called `across()` which is designed to work across multiple variables. Have a look at Rebecca Barter's awesome blog [here](http://www.rebeccabarter.com/blog/2020-07-09-across/).    

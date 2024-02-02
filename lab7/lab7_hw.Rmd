@@ -32,52 +32,73 @@ Load the data `FAO_1950to2012_111914.csv` as a new object titled `fisheries`.
 fisheries <- readr::read_csv(file = "data/FAO_1950to2012_111914.csv")
 ```
 
-1. Do an exploratory analysis of the data (your choice). What are the names of the variables, what are the dimensions, are there any NA's, what are the classes of the variables?  
-```{r}
+1. Do an exploratory analysis of the data (your choice). What are the names of the variables, what are the dimensions, are there any NA's, what are the classes of the variables? 
 
+**ADD MORE HERE** 
+```{r}
+summary(fisheries)
+```
+
+```{r}
+#names(fisheries) #This gives the names of the variables. 
+#dim(fisheries) #This gives the dimensions 17692 observations, 71 variables 
 ```
 
 2. Use `janitor` to rename the columns and make them easier to use. As part of this cleaning step, change `country`, `isscaap_group_number`, `asfis_species_number`, and `fao_major_fishing_area` to data class factor. 
 ```{r}
-
+fisheries <-  clean_names(fisheries)
+class(fisheries$country) <- "Factor"
+class(fisheries$isscaap_group_number) <- "Factor"
+class(fisheries$asfis_species_number) <- "Factor"
+class(fisheries$fao_major_fishing_area) <- "Factor"
+#The $ allows access to one variable in a data set.
 ```
 
+ 
 We need to deal with the years because they are being treated as characters and start with an X. We also have the problem that the column names that are years actually represent data. We haven't discussed tidy data yet, so here is some help. You should run this ugly chunk to transform the data for the rest of the homework. It will only work if you have used janitor to rename the variables in question 2!  
 ```{r}
-#fisheries_tidy <- fisheries %>% 
-#  pivot_longer(-c(country,common_name,isscaap_group_number,isscaap_taxonomic_group,asfi#s_species_number,asfis_species_name,fao_major_fishing_area,measure),
-#               names_to = "year",
-#               values_to = "catch",
-#               values_drop_na = TRUE) %>% 
-#  mutate(year= as.numeric(str_replace(year, 'x', ''))) %>% 
-#  mutate(catch= str_replace(catch, c(' F'), replacement = '')) %>% 
-#  mutate(catch= str_replace(catch, c('...'), replacement = '')) %>% 
-#  mutate(catch= str_replace(catch, c('-'), replacement = '')) %>% 
-#  mutate(catch= str_replace(catch, c('0 0'), replacement = ''))
+fisheries_tidy <- fisheries %>% 
+  pivot_longer(-c(country,common_name,isscaap_group_number,isscaap_taxonomic_group,asfis_species_number,asfis_species_name,fao_major_fishing_area,measure),
+               names_to = "year",
+               values_to = "catch",
+               values_drop_na = TRUE) %>% 
+  mutate(year= as.numeric(str_replace(year, 'x', ''))) %>% 
+  mutate(catch= str_replace(catch, c(' F'), replacement = '')) %>% 
+  mutate(catch= str_replace(catch, c('...'), replacement = '')) %>% 
+  mutate(catch= str_replace(catch, c('-'), replacement = '')) %>% 
+  mutate(catch= str_replace(catch, c('0 0'), replacement = ''))
 
-#fisheries_tidy$catch <- as.numeric(fisheries_tidy$catch)
+fisheries_tidy$catch <- as.numeric(fisheries_tidy$catch)
 ```
 
 **This was added to clean the data, when doing the homework remove all the hashtags and run this**
 
 3. How many countries are represented in the data? Provide a count and list their names.
 ```{r}
-
+table(fisheries_tidy$country)
+n_distinct(fisheries_tidy$country)
 ```
+
+**There are 203 countries** 
 
 4. Refocus the data only to include country, isscaap_taxonomic_group, asfis_species_name, asfis_species_number, year, catch.
 ```{r}
-
+fisheries_tidy %>% 
+  select(country, isscaap_taxonomic_group, asfis_species_name, asfis_species_number, year, catch)
 ```
 
 5. Based on the asfis_species_number, how many distinct fish species were caught as part of these data?
 ```{r}
-
+n_distinct(fisheries_tidy$asfis_species_name)
 ```
+**1546 species were caught**
 
 6. Which country had the largest overall catch in the year 2000?
 ```{r}
-
+fisheries_tidy %>% 
+  filter(year=="2000") %>% 
+  summarize(across(c(country, catch)), max_catch = max(catch)) %>% 
+  arrange(desc(catch))
 ```
 
 7. Which country caught the most sardines (_Sardina pilchardus_) between the years 1990-2000?
