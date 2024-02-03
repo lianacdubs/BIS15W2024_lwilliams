@@ -330,3 +330,25 @@ Practice on mutate(), mutate_all(), across function, if_else()
 
 #Lab 6.2  
 The 'janitor' package has the function 'tabyl()' which produces counts and percentages.
+**refer to HW for the code for this section**  
+
+#Lab 7.1  
+Tips for Midterm: 
+Read the abstract to understand the data. If a piece of code doesn't run put a hashtag in front of it. 
+group_by works for categorial variables and it is a way to produce summaries for observations that share an element of interest  
+the functions 'summarize' and 'group_by' work well together.  
+'count' works when you are only interested in the number of observations (like a combination of groupby and summarize)  
+the new package is skimr 
+Code involving select(), filter(), mutate()
+## `summarize()`
+`summarize()` will produce summary statistics for a given variable in a data frame.  
+Shortcut to run only a couple lines of code is #Note: shortcut highlight command return  
+
+**n_distinct is a function needed for the exam**
+
+`n_distinct()` is a very handy way of cleanly presenting the number of distinct observations.  
+There are many other useful summary statistics, depending on your needs: sd(), min(), max(), median(), sum(), n() (returns the length of a column), first() (returns first value in a column), last() (returns last value in a column) and n_distinct() (number of distinct values in a column).  
+#Lab 7.2 
+More groupby and summarize practice. 
+`count()` is an easy way of determining how many observations you have within a column. It acts like a combination of `group_by()` and `n()`.  
+There is a function in dplyr called `across()` which is designed to work across multiple variables.

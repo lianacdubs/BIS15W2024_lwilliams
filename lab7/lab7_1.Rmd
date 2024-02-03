@@ -101,6 +101,7 @@ msleep %>%
   filter(bodywt>200) %>% 
   summarize(mean_sleep_lg = mean(sleep_total))
 ```
+
 ```{r}
 msleep %>% 
   filter(bodywt<10) %>% 
