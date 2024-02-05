@@ -173,6 +173,7 @@ vector: is a data structure in R. It is essentially multiple variables of the sa
 -Build a data matrix. 
 
 #Lab 3 
+Lab 3 intro makes a data matrix. 
 For the warm up when we were making the matrix. How do you know it by nrow =5 and byrow = F? What do those functions do?
 - Byrow if you want to fill in horizontal (T) 
 -bycolmn  if fill top to bottom. (F)
@@ -216,6 +217,19 @@ We can also 'View()' in the environment panel
 ## Filter
 Filter is a way of pulling out observations that meet specific criteria in a variable. (More in lab 4).   
 Observations are in a cell of the spreadsheet  
+
+#HW 3 
+msleep <- msleep # this object now appears in the environment panel.
+dim()
+checks NAs 
+names() tells a list of column names 
+make two dataframes with parameters.
+mean calculation
+```{r}
+large_mean <- mean(large$bodywt)
+large_mean
+```
+
 
 ##Lab 4    
 ##4.1   
