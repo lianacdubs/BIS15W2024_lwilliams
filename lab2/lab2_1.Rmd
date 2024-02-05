@@ -31,6 +31,7 @@ To print the object to the screen, just type x.
 ```{r}
 x
 ```
+
 ```{r}
 y <- 30
 ```
@@ -46,6 +47,7 @@ Here we make a new object `my_experiment` that is the sum of the treatment and c
 my_experiment <- sum(treatment, control)
 my_experiment
 ```
+
 ```{r}
 treatment+control
 ```

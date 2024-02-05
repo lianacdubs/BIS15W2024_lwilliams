@@ -112,7 +112,6 @@ hotspring_temp_matrix[2,3]
 ```
 
 9. Calculate the mean for Jill's column only.  
-
 ```{r}
 Jill_col <- hotspring_temp_matrix[ ,1]
 mean(Jill_col)
@@ -120,7 +119,6 @@ mean(Jill_col)
 ```
 
 10. Use the data matrix to perform one calculation or operation of your interest.
-
 ```{r}
 hotspring_temp_matrix[1:8]
 #Use a colon `:` to selects the temperatures for each of the springs in Jill's column. 
