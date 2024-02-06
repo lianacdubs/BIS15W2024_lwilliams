@@ -7,6 +7,257 @@ date: "2024-01-30"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+#Keyboard Shortcuts 
+Insert Pipe Operator Cmd+Shift+M
+Knit Document (knitr)	Ctrl+Shift+K	Cmd+Shift+K
+
+Insert chunk (Sweave and Knitr)	Ctrl+Alt+I	Cmd+Option+I
+Run all chunks above the current chunk with Command + Option + P on a Mac; Ctrl + Alt + P on Linux and Windows.
+
+Run the current chunk with Command + Option + C or Command + Shift + Enter on a Mac; Ctrl + Alt + C or Ctrl + Shift + Enter on Linux and Windows.
+
+Run the next chunk with Command + Option + N on a Mac; Ctrl + Alt + N on Linux and Windows.
+
+Run all chunks with Command + Option + R or Command + A + Enter on a Mac; Ctrl + Alt + R or Ctrl + A + Enter on Linux and Windows.
+
+
+**dplyr** is a package in tidyverse
+Note: =assignment but, == equal to 
+
+##Syntax
+# %>% Piping
+passes object on left hand side as first argument (or . argument) of function on righthand side. 
+x %>% f(y) is the same as f(x, y) 
+```{r}
+iris %>% 
+  group_by(species) %>% 
+  summarize(avg = mean(Sepal.Width)) %>% 
+  arrange(avg)
+```
+
+#glimpse()
+shows all variables, their first value, type, gives number of variables and observations.; information dense summary of tbl data 
+```{r}
+glimpse(table2)
+```
+#view() 
+puts the table in the environment panel and you can sort ; views like a spreadsheet 
+```{r}
+view(table2)
+```
+#arrange()
+allows you to sort 
+```{r}
+table2 %>% 
+  arrange(year) #this could also be arrange(year, type)
+Ex: 
+  arrange(mtcars, mpg) #order rows by values of a column (low to high)
+Ex:
+  arrange(mtcars, desc(mpg)) #order rows by values of a column (high to low)
+```
+
+#select()
+include the column names (variables) that you want or you can put a (-) in front of them indicating that you pull out those columns. 
+```{r}
+table1 %>% 
+  select(country, populations)
+table1 %>% 
+  select(-cases, -year) #select all columns except cases and year 
+Ex:
+select(iris, contains(".")) #select column whose name contains a character string. 
+Ex: 
+select(iris, ends_with("length")) #select column whose name ends with a character string. #starts__with is also a command 
+Ex: select(iris, sepal.length:petal.width) #select all columns btwn speal.length and petal.width (inclusive)
+```
+#filter()
+Extract rows (observations) that meet specific criteria
+```{r}
+table1 %>% 
+  filter(year == 2000)
+table1 %>% 
+  filter(year != 2000)
+```
+#mutate()
+create a new column 
+```{r}
+table1 %>% 
+  mutate(fill_it = "with a smile :)") %>% #fill_it is the name of the new variable
+  mutate(popul_per_case = population / cases)
+
+table1 %>% 
+  mutate(fill_it = "with a smile :)") %>% 
+  rename(much_better_name = fill_it)
+
+#mutate() functions take a vector of values and return another vector of values, such as: 
+between() #are the values btwn a and b?
+```
+#group_by()
+groups data into rows of the same value of species 
+#summarize()
+summarize data into a single row of values for each of the groups. 
+```{r}
+table1 %>% 
+  summarize(counting = n())
+table1 %>% 
+  summarize(sum = sum(population)) #sums all the values in the column 
+table1 %>% 
+  summarize(average = mean(population))
+table1 %>% 
+  summarize(avr_popul = mean(population), all_cases = sum(cases), how_many = n())
+table1 %>% 
+  group_by(cyl, am) %>% 
+  summarize(avr_mpg = mean(mpg), avr_hp = mean(hp), count = n())
+```
+#Distinct() 
+pass whatever columns you want and gives distinct rows; remove duplicate rows 
+```{r}
+distinct(iris)
+```
+
+dplyr::sample_n (iris, 10, replace = TRUE) #randomly select n rows
+#Count()
+counts the number of rows with each unique value of variable
+
+
+
+**summary functions** this is wha 'summarize()' uses 
+Take a vector of values and return a single value, such as: 
+dplyr::first #first value of a vector 
+dplyr::last #last value of a vector 
+dplyr::nth #nth value of a vector 
+dplyr::n #number of values in a vector 
+dplyr::n_distinct # number of distinct values in a vector 
+
+IQR 
+min #min value in a vector 
+max 
+mean 
+median 
+var #variance of a vector 
+sd #standard deviation from a vector 
+
+#Logic in R 
+<
+>
+==
+<=
+>=
+!=
+%in%
+is.na
+!is.na 
+&, |, !, xor, any, all (Boolean Operators)
+
+
+AND	&	#conditions on both sides need to be satisfied. 
+4 == 3 & 1 == 1
+
+4 == 4 & 1 == 1
+
+FALSE
+
+TRUE
+
+OR	|	#requires at least one condition be met on either side of the boolean operator. Note: the output will be TRUE if both conditions are met
+4 == 4 | 1 == 1
+
+4 == 3 | 1 == 1
+
+4 == 3 | 1 == 2
+
+TRUE
+
+TRUE
+
+FALSE
+
+NOT	!	#reverse the outcome of a condition
+!(4 == 3) #!(false) = true
+
+!(4 == 4)
+
+TRUE
+
+FALSE
+
+```{r}
+library(dplyr)
+library(readr)
+billboard100 <- read_csv("billboard100.csv")
+```
+
+# Piping %>%
+```{r}
+head(billboard100, 10)
+
+billboard100 %>% head(10)
+10 %>% head(billboard100, .)
+```
+# Select
+```{r}
+billboard100 %>%
+  select(date, rank, song, artist, 'weeks-on-board')
+
+billboard100 %>%
+  select(date:artist, weeks_popular='weeks-on-board')
+
+billboard100 %>%
+  select(-'last-week', -'peak-rank')
+```
+# Mutate
+```{r}
+billboard100 %>%
+  select(date:artist, weeks_popular='weeks-on-board') %>%
+  mutate(is_collab = grepl('Featuring', artist)) %>%
+  select(artist, is_collab, everything())
+```
+# Filter
+```{r}
+billboard100 %>%
+  select(date:artist, weeks_popular='weeks-on-board') %>%
+  filter(weeks_popular >= 20, artist == 'Drake' | artist == 'Taylor Swift')
+```
+
+# Distinct
+```{r}
+billboard100 %>%
+  select(date:artist, weeks_popular='weeks-on-board') %>%
+  filter(artist == 'Drake') %>%
+  distinct(song)
+
+billboard100 %>%
+  select(date:artist, weeks_popular='weeks-on-board') %>%
+  filter(artist == 'Drake') %>%
+  distinct(song) %>%
+  .$song
+```
+
+# Group_by & Summarise
+```{r}
+billboard100 %>%
+  select(date:artist, weeks_popular='weeks-on-board') %>%
+  filter(artist == 'Drake') %>%
+  group_by(song) %>%
+  summarise(total_weeks_popular = max(weeks_popular))
+```
+# Arrange
+```{r}
+billboard100 %>%
+  select(date:artist, weeks_popular='weeks-on-board') %>%
+  filter(artist == 'Drake') %>%
+  group_by(song) %>%
+  summarise(total_weeks_popular = max(weeks_popular)) %>%
+  arrange(desc(total_weeks_popular), song) %>%
+  head(10)
+```
+
+# Count
+```{r}
+billboard100 %>%
+  select(date:artist, weeks_popular='weeks-on-board')  %>%
+  count(artist) %>%
+  arrange(desc(n))
+```
 
 #This document includes all the examples from the warmup + HW code we have done. Please refer to the specific LAB for practice code! 
 HW #1: RMarkdown (lab 1)
@@ -14,7 +265,7 @@ HW #2: Data Structures (lab 2)
 HW #3. Data Frames (lab 3)
 HW #4: Dplyr Practice (lab 4)
 HW #5: Dplyr Superhero (lab 6.2)
-HW #6: Summary Functions (? location)
+HW #6: Summary Functions (HW7)
 
 # Lab 5 Intro
 ```{r}

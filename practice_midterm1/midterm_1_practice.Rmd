@@ -108,7 +108,7 @@ gabon <- readr::read_csv("data/IvindoData_DryadVersion.csv")
 ```
 ```{r}
 gabon <- gabon %>% 
-  mutate_if(is.character, factor) ##REVIEW THIS QUESTION! 
+  mutate_if(is.character, factor) ##This changes all the characters to factors! 
 ```
 
 
@@ -150,5 +150,6 @@ gabon %>%
 12. (4 points) Based on your interest, do one exploratory analysis on the `gabon` data of your choice. This analysis needs to include a minimum of two functions in `dplyr.`
 ```{r}
 ## Do this! 
+## common functions in dplyr are select, filter, arrange, mutate, and summarize. 
 ```
 
