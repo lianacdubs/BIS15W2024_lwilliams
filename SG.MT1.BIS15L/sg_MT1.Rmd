@@ -191,32 +191,78 @@ Data Frames show the class of data.
 'str()' gives the structure; this gives the structure where each variable(column) is NOW a row, an observation is what goes in a cell.
 `dbl` means that the value is a type of numeric [double precision floating point](http://uc-r.github.io/integer_double/).  
 We can change the name in a dataframe by (new_name=Old_name) the data in the dataframe is overwritten so it now appears as new_name for the variable. 
+```{r}
+hbirds <- data.frame(sex=Sex, length=Length, weight_g=Weight)
+#the word to the left of the equal sign is the new word and the word to the right of the equal sign is the old word. This will overwrite the data we had. This is similar to clean_names
+```
+
 ## Accessing Data Frame Columns and Rows 
 The same methods of selecting elements in vectors and data matrices apply to data frames. We use `[]`. We have two positions where the first applies to the rows, and the second to the columns.  
 Ex: hbirds[1,] means first row; if [,3] then, 3rd column.
-We can also select values in an entire column using the `$` sign.  
-We can add a new bird's data with the `rbind()` function, known as row bind. It will bind our new vector to our data frame row-wise.
+We can also select values in an **entire column** using the `$` sign.
+We can also add more data with $ 
+```{r}
+hbirds$neighborhood <- c("lakewood", "brentwood", "lakewood", "scenic Heights")
+hbirds
+```
+
+## Adding Rows 
+```{r}
+hbirds<- rbind(hbirds, new_bird)
+hbirds
+```
+
+We can add a new bird's data with the `rbind()` function, known as row bind. It will bind our new vector to our data frame row-wise. 
+
 ## Writing Data to File  
 .csv is comma separated values (data type that can be imported into R)
+```{r}
+write.csv(hbirds, "hbirds_data.csv", row.names = FALSE)
+```
+
 
 ##3.2 
 1. Import .csv files as data frames using `read_csv()`.  
 ##Load the Data 
-Since we are using the tidyverse, we open the file using `read_csv()`. `readr` is included in the tidyverse set of packages. We specify the package and function with the `::` symbol. This becomes important if you have multiple packages loaded that contain functions with the same name. 
+Since we are using the tidyverse, we open the file using `read_csv()`. `readr` is included in the tidyverse set of packages.
+```{r}
+hot_springs <- read_csv("hsprings_data.csv")
+#or an alternative is if its in another folder. 
+fish <- read_csv("data/Gaeta_etal_CLC_data.csv")
+#note data/ will open the folder called data. alternatively but not practice would be to draf the file in the main lab3 folder
+```
+
+We specify the package and function with the `::` symbol. This becomes important if you have multiple packages loaded that contain functions with the same name. 
 A **factor** has discrete levels (there is a max. amount). 
 ## Summary functions
 We can summarize our data frame with the`summary()` function.  
-`glimpse()` is another useful summary function.  
-`nrow()` gives the numbers of rows.  
+`glimpse()` is another useful summary function. 
+'str()' get an idea of the data structure
+'class()' 
+`nrow()` gives the numbers of rows.
 `ncol` gives the number of columns.  
 `names` gives the column names.  
 `head()` prints the first n rows of the data frame.  
 `tail()` prinst the last n rows of the data frame.  
 `table()` is useful when you have a limited number of categorical variables. It produces fast counts of the number of observations in a variable. We will come back to this later...   
-We can also 'View()' in the environment panel  
+We can also 'View()' in the environment panel
+```{r}
+hot_springs$scientist <- as.factor(hot_springs$scientist)
+#replace scientist in the hotsprings dataframe but make it into a factor
+```
+#a factor has discrete levels (there is a max amount)
+```{r}
+levels(hot_springs$scientist) #tells how many different factors you have in a variable.
+```
+
+'summary()' you can summarize the data frame. It gives basic stats. The values have to be numeric. 
+
 ## Filter
 Filter is a way of pulling out observations that meet specific criteria in a variable. (More in lab 4).   
 Observations are in a cell of the spreadsheet  
+```{r}
+
+```
 
 #HW 3 
 msleep <- msleep # this object now appears in the environment panel.
@@ -232,6 +278,14 @@ large_mean
 
 
 ##Lab 4    
+Warmup has good stuff
+What is the mean body mass for all individuals in the `penguins` dataset?
+
+```{r}
+mean(penguins$body_mass_g, na.rm=T) 
+#before adding na.rm=T the output is NA so, you have to do this command to get mean. 
+```
+
 ##4.1   
 Note: Data frames are more detailed than a data matrix.  
 **read** (is the command) to IMPORT csv  
@@ -241,6 +295,8 @@ Note: Data frames are more detailed than a data matrix.
 ##Load the data  
 fish <- readr::read_csv("data/Gaeta_etal_CLC_data.csv")
 ##readr is ecplicit of the package we are using. the code would work without this. 
+## Tidyverse 
+is an "opinionated" collection of packages that make workflow in R easier. (clean, organize, manage data )
 **Every variable(vertical) is own column**  
 **Every observation(horizontal) in own row**  
 **Each (cell) has one value**  
@@ -284,7 +340,18 @@ select(fish, starts_with("radii"))
 #These are the most common! 
 Options to select columns based on a specific criteria include:  
 1. ends_with() = Select columns that end with a character string  
-2. contains() = Select columns that contain a character string  
+```{r}
+select(fish, ends_with("id")) 
+#ends with id shows lakeid and fish_id
+```
+
+2. contains() = Select columns that contain a character string 
+
+Select the columns that include "mass" as part of the name.  
+```{r}
+select(mammals_new, contains("mass"))
+```
+
 3. matches() = Select columns that match a regular expression  (regex)
 4. one_of() = Select columns names that are from a group of names  
 
@@ -302,25 +369,83 @@ select_if(fish, ~!is.numeric(.))
 
 #The practice 
 ##shows how to load the data, access structure, find NAs, names of the columns, rename the columns (new name= old name), select to build a new dataframe to include variables of interest, using the - operator to exclude variables, select columns using contain, select all columns that are of class)  
-### Other features include jantor (which is a package) + running it, tolower(), toupper(), and code to remove blanks    
+### Other features include jantor (which is a package) + running it, tolower(), toupper(), and code to remove blanks 
+When naming columns, blank spaces are often added (don't do this, please). Here is a trick to remove these.  
+```{r}
+#select_all(mammals, ~str_replace(., " ", "_"))
+```
+
 
 #Lab 4.2  
+'select()' allows use to extract columns of interest from a data frame. (Cannot extract observations from within the dataframe.)
 **The `filter()` function allows us to extract data that meet specific criteria.**  
 ## `filter()`
 Unlike `select()`, `filter()` allows us to extract data that meet specific criteria within a variable. Let's say that we are interested only in the fish that occur in lake "AL". We can use `filter()` to extract these observations.
-###Filter allows us to search through a dataframe and pull out observations (rows) of interest. Can be used to explore data of interest and reshape dataframes to focus on certain questions  
+###Filter allows us to search through a dataframe and pull out observations (rows) of interest. Can be used to explore data of interest and reshape dataframes to focus on certain questions 
+```{r}
+filter(fish, lakeid == "AL") #pull out 383 observations
+#instead of lakeid you can do length>=300
+```
 `filter()` allows all of the expected operators; i.e. >, >=, <, <=, != (not equal), and == (equal).  
 Using the `!` operator allows for the exclusion of specific observations  
+```{r}
+not_AL <- filter(fish, lakeid != "AL") #! means not
+```
+
 ## Using `filter()` with multiple observations  
 Filtering multiple values within the same variable requires the `%in%`
+```{r}
+filter(fish, length %in% c(167, 175))
+#within the variable length all those with length 167 or 175
+#multiple values in the same variable %n% 
+```
+
 Alternatively, you can use `between` if you are looking for a range of specific values.
+```{r}
+filter(fish, between(scalelength, 2.5, 2.55))
+```
+
 You can also extract observations "near" a certain value but you need to specify a tolerance.  
+```{r}
+filter(fish, near(radii_length_mm, 2, tol = 0.2))
+#look for radii length near two but within 0.2 of eachother 
+#tol = tolerance
+```
+
 ## Practice
 1. Filter the `fish` data to include the samples from lake "BO".
+```{r}
+filter(fish, lakeid=="BO") #shows the BO samples
+```
+
 2. Filter the data to include all lakes except "AR".
-3. Filter the fish data to include all fish with a scalelength within 0.25 of
-4. Filter the fish data to include fish with a scalelength between 2 and 4.  
+```{r}
+filter(fish, lakeid != "AR")
+```
+
+3. Filter the fish data to include all fish with a scalelength within 0.25 of 8 
+```{r}
+filter(fish, near(scalelength, 8, tol=0.25))
+```
+
+4. Filter the fish data to include fish with a scalelength between 2 and 4. 
+```{r}
+filter(fish, between(scalelength, 2, 4))
+```
+
+```{r}
+#this also works 
+filter(fish, scalelength %in% c(2,4))
+```
+
 ## Using `filter()` on multiple conditions
+```{r}
+filter(fish, lakeid == "AL" & length > 350) #extract only the fish that have lakeid "AL" and length >350.
+```
+
+```{r}
+filter(fish, lakeid == "AL" | length > 350) #Or doubles the variables
+```
 You can also use `filter()` to extract data based on multiple conditions. 
 & and | operators  
 Rules:  
@@ -328,6 +453,11 @@ Rules:
 + `filter(condition1, !condition2)` will return all rows where condition one is true but condition 2 is not.  
 + `filter(condition1 | condition2)` will return rows where condition 1 or condition 2 is met.  
 + `filter(xor(condition1, condition2)` will return all rows where only one of the conditions is met, and not when both conditions are met. 
+```{r}
+filter(fish, length > 400, (scalelength > 11 | radii_length_mm > 8))
+#filter out the fish with a length greater than 400 and a scale length over 11 or a radiii length over 8
+```
+
 
 
 **A little note on Pipe**
@@ -346,6 +476,57 @@ morning_routine <- wakeup(self) %>%
   put_on("clothes") %>% 
   eat("breakfast") %>% 
   go(to = "work")
+```
+
+#HW 4 
+Change the class of the variable 'taxon' to a factor and display the levels. 
+```{r}
+#homerange is the dataset. 
+homerange$taxon <- as.factor(homerange$taxon)
+levels(homerange$taxon) 
+```
+
+Make a dataframe that is restricted to certain variables 
+```{r}
+taxa <- select(homerange, "taxon", "common.name", "class", "order", "family", "genus", "species")
+taxa
+```
+
+
+The species in `homerange` are also classified into trophic guilds. How many species are represented in each trophic guild.**  
+```{r}
+table(homerange$trophic.guild)
+```
+
+**8. Do herbivores or carnivores have, on average, a larger `mean.hra.m2`? Remove any NAs from the data.**  
+```{r}
+mean(herbivores$mean.hra.m2, rm.na=T)
+```
+
+
+ Make a new dataframe `owls` that is limited to the mean mass, log10 mass, family, genus, and species of owls in the database. Which is the smallest owl? What is its common name? Do a little bit of searching online to see what you can learn about this species and provide a link below** 
+```{r}
+owls <- filter(homerange, order=="strigiformes")
+owls_df <- select(owls, "mean.mass.g", "log10.mass", "family", "genus", "species")
+filter(owls_df, mean.mass.g==61.32) #This finds the specific small owl
+```
+
+```{r}
+#owls_datf <- select(filter(homerange, order=="strigiformes"), mean.mass.g, log10.preymass, family, genus, species)
+#owls_datf
+#all birds belongs to aves 
+#all owls belong to one order called strigiformes
+#To get the common name I added it to the comma list as common.name,
+```
+#^This was another methods that I found to work
+
+**10. As measured by the data, which bird species has the largest homerange? Show all of your work, please. Look this species up online and tell me about it!**.  
+```{r}
+birds <- filter(homerange, taxon=="birds")
+max(birds$mean.hra.m2)
+```
+```{r}
+filter(birds, mean.hra.m2==2.41e+08)
 ```
 
 The tidyverse is a series of packages that allows you to more easily perform the steps of data science. 
@@ -376,20 +557,110 @@ Rules:
 #filter(fish, length > 400, (scalelength > 11 | radii_length_mm > 8))
 ```
 
+##Practice 
+1.  From the `mammals` data, filter all members of the family Bovidae with a mass greater than 450000.
+```{r}
+bovidae <- filter(mammals, mass>450000)
+```
+
+2. From the `mammals` data, build a data frame that compares `mass`, `gestation`, and `newborn` among the primate genera `Lophocebus`, `Erythrocebus`, and `Macaca`. Among these genera, which species has the smallest `newborn` mass?
+```{r}
+mammals2 <- select(mammals,"order", "genus", "mass", "gestation", "newborn")
+mammals3 <- filter(mammals2, order=="Primates")
+```
+
+```{r}
+mammals4 <- filter(mammals3, genus %in% c("Lophocebus", "Erythrocebus", "Macaca")) #click on the table and then sort it. 
+```
+#the problem with this way is it doesnt take the output of one command and feed it into another. 
+
 #Lab 5.2 
 Pipes %>%  allow us to combine 'select()', 'filter()' and other functions efficently. Pipes feed the output from one function into the input of another function. 
 
+In this example, we use a pipe to select only `lakeid` and `scalelength` then filter that output only for lakes "AL". Notice that we only need to call the data one time.  
+```{r}
+select(fish, lakeid, scalelength) #pull variables of interest
+```
+
+```{r}
+filter(fish, lakeid == "AL") #pull observations of interest
+```
+
+#shift,command,m makes the pipe. 
+
+```{r}
+fish %>% #shift,command,m makes the pipe. 
+  select(lakeid, scalelength) %>% #the commands are then nested. use the fish data take out lakeid and scalelength
+  filter(lakeid == "AL") #^use the output of the select function to filter out observations of interst.
+```
+
+Here we select family, genus, and species then filter for gestation greater than 15 months.
+```{r}
+mammals %>% 
+  select(family, genus, species, gestation) %>% 
+  filter(gestation>=15)
+```
+
+## Practice
+1. We are interested in the fish from the lakes "AL" and "AR" with a radii length between 2 and 4. Extract this information from the `fish` data. Use pipes!  
+```{r}
+fish %>% #work with  fish data 
+  select(lakeid, radii_length_mm) %>% #pull out variables of interest
+  filter(lakeid == "AL" | lakeid=="AR") %>% #only these lakes 
+  filter(between(radii_length_mm, 2, 4)) %>% #between 2 and 4 
+  arrange(desc(radii_length_mm)) #sort for conciseness; arrange in decending order for radiilength 
+```
 On MAC: shift,command,m
 ^^ How to make a pipe!  
 
 'arrange()' command is like a SORT command in excel. The default is in ascending order.   
 To sort in decreasing order, wrap the variable name in `desc()`.  
 
+```{r}
+fish %>% 
+  select(lakeid, scalelength) %>% 
+  arrange(scalelength) #easy to find which has the smallest or largest (based on hw 4)
+```
+
+To sort in decreasing order, wrap the variable name in `desc()`.
+```{r}
+fish %>% 
+  select(lakeid, scalelength) %>% 
+  arrange(desc(scalelength))
+```
+
+`arrange()` can be very helpful in combination with the other functions.
+```{r}
+fish %>% 
+  select(lakeid, length, fish_id, scalelength) %>% 
+  filter(lakeid=="AL") %>% 
+  arrange(fish_id)
+```
+
 `mutate()`  
-Mutate allows us to create a new column from existing columns in a data frame.  
+Mutate allows us to create a new column from existing columns in a data frame. 
+
+Let's convert the length variable from cm to millimeters and create a new variable called length_mm.  
+```{r}
+fish %>% 
+  mutate(length_mm = length*10) %>% 
+  select(fish_id, length, length_mm)
+```
 
 `mutate_all()`
 This last function is super helpful when cleaning data.  
+
+Here is an example that changes all entries to lowercase (if present).  
+```{r}
+mammals %>%
+  mutate_all(tolower)
+```
+
+Using the across function we can specify individual columns.
+```{r}
+mammals %>% 
+  mutate(across(c("order", "family"), tolower))
+```
 
 Here is an example that changes all entries to lowercase (if present).  
 
@@ -397,6 +668,20 @@ Using the across function we can specify individual columns.
 
 With `ifelse()`, you first specify a logical statement, afterwards what needs to happen if the statement returns `TRUE`, and lastly what needs to happen if it's  `FALSE`.  
 -use if_else to allow to use the 'mutate' function but, not have the entire column affected in the same way. this is similar to find and replace. 
+
+Have a look at the data from mammals below. Notice that the values for newborn include `-999.00`. This is sometimes used as a placeholder for NA (but, is a really bad idea). We can use `if_else()` to replace `-999.00` with `NA`.  
+```{r}
+mammals %>% 
+  select(genus, species, newborn) %>% 
+  arrange(newborn)
+```
+
+```{r}
+mammals %>% 
+  select(genus, species, newborn) %>%
+  mutate(newborn_new = ifelse(newborn == -999.00, NA, newborn))%>% 
+  arrange(newborn)
+```
 
 
 #Lab 6.1  
@@ -515,6 +800,7 @@ Exploratory analysis of data
 Rename columns 
 ```{r}
 #fisheries <- clean_names(fisheries)
+#running the janitor library you can perform this function to rename things.
 ```
 
 Change the data class to a factor 
