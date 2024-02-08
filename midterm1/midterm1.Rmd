@@ -45,17 +45,32 @@ Problem 2. (1 point) Use the function of your choice to summarize the data and g
 glimpse(wolves) # information dense summary of data 
 ```
 
+```{r}
+#You can also do str(wolves)
+```
+
 Problem 3. (3 points) Which parks/ reserves are represented in the data? Don't just use the abstract, pull this information from the data.
 ```{r}
 table(wolves$park)
 ```
 
 The five parks represented in the data are: DENA, GNTP, VNP, YNP, and YUCH. 
+```{r}
+#wolves %>% distinct(park) this is another way to do it 
+```
+
 
 Problem 4. (4 points) Which park has the largest number of wolf packs?
 ```{r}
 wolves %>% 
   arrange(desc(packsize_aug))
+```
+
+```{r}
+#wolves %>% 
+# group_by(park) %>% 
+# summarize(packs = n_distinct(pack)) %>% 
+# arrange(desc(packs))
 ```
 
 The park with the largest number of wolf packs is YNP with 37. packsize_aug is the pack size in the fall. 
@@ -67,6 +82,13 @@ wolves %>%
   arrange(park)
 ```
 mortALL is the total number of human-caused mortalities for the pack-year. DENA park has the highest number (4) of human-caused mortalities. 
+
+```{r}
+#wolves %>% 
+# group_by(park)M
+# summarize(deaths = sum(mort_all)) %>% 
+# arrange(desc(deaths))
+```
 
 The wolves in [Yellowstone National Park](https://www.nps.gov/yell/learn/nature/wolf-restoration.htm) are an incredible conservation success story. Let's focus our attention on this park.  
 
@@ -86,6 +108,16 @@ ynp %>%
 ```
 The average pack size for druids between 1997 to 2010 is 14.57143. 
 
+```{r}
+#druids <- ynp %>% filter(pack=="druid")
+
+#mean(druids$packsize_aug)
+
+#ynp %>% 
+  #filter(pack=="druid") %>%
+  #summarize(mean_packsize = mean(packsize_aug))
+```
+
 Problem 8. (4 points) Pack dynamics can be hard to predict- even for strong packs like the Druid Peak pack. At which year did the Druid Peak pack have the largest pack size? What do you think happened in 2010?
 ```{r}
 #select(ynp, packsize_aug) %>% 
@@ -94,6 +126,13 @@ Problem 8. (4 points) Pack dynamics can be hard to predict- even for strong pack
   #filter(pack=="druid")
   #summarize(mean_pack_size = mean(packsize_aug))
 #view(ynp) #I viewed by name druid in the packs variable and looked at packsizeAug to determine the size. 
+```
+
+```{r}
+#wolves %>% 
+  #filter(pack=="druid") %>% 
+  #select(biolyr, packsize_aug) %>% 
+  #arrange(biolyr)
 ```
 
 The druid had the largest pack size in 2001 with 37. In 2010 there are 0 in the pack and I think they were all killed off by another species. 
@@ -107,7 +146,15 @@ ynp %>%
   arrange(desc(persistence))
 ```
 
-The pack with the highest overall persistence was mollies with 26. The Mollies are known for its adaptations to killing bison. 
+The pack with the highest overall persistence was mollies with 26. The Mollies are known for its adaptations to killing bison.
+
+```{r}
+#ynp %>%
+  #group_by(pack) %>%
+  #summarize(persistence = sum(persisty1, na.rm=T)) %>% 
+  #arrange(desc(persistence))
+```
+
 
 Problem 10. (3 points) Perform one analysis or exploration of your choice on the `wolves` data. Your answer needs to include at least two lines of code and not be a summary function.
 ```{r}
@@ -115,3 +162,12 @@ wolves %>%
   filter(packsize_aug<3) %>% 
   summarize(mean_packsize = mean(packsize_aug)) 
 ```
+
+```{r}
+#ynp %>% 
+  #filter(pack=="druid") %>%
+  #ggplot(aes(x=biolyr, y=packsize_aug)) +
+  #geom_col()+
+  #coord_flip()
+```
+
