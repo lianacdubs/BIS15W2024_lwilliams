@@ -72,6 +72,15 @@ superhero_info %>%
 ```
 **There are 24 neutral superheros in the superhero_info dataframe.**
 
+#Alternative to Q2 
+```{r}
+neutral <- superhero_info %>% filter(alignment=="neutral")
+```
+
+```{r}
+neutral$name
+```
+
 ## `superhero_info`
 3. Let's say we are only interested in the variables name, alignment, and "race". How would you isolate these variables from `superhero_info`?
 ```{r}
@@ -83,6 +92,11 @@ superhero_info %>%
 ```{r}
 #select(superhero_info, name, alignment, race)
 #This is another solution for getting the variables we are interested in without involving a pipe. 
+```
+
+#Alterative to Q3 
+```{r}
+superhero_info %>% select("name", "alignment", "race")
 ```
 
 ## Not Human
@@ -97,6 +111,14 @@ superhero_info %>%
 #This is another way to do the problem not involving a pipe. This looks within race column and returns the entire superhero_info table and all the "races" that are NOT human. 
 ```
 
+#Alternative to Q4 
+```{r}
+not_human <- superhero_info %>% filter(race!="Human")
+```
+
+```{r}
+not_human$name
+```
 
 ## Good and Evil
 5. Let's make two different data frames, one focused on the "good guys" and another focused on the "bad guys".
@@ -124,6 +146,19 @@ bad_guys <- superhero_info %>%
 #This method doesn't involve pipes
 ```
 
+#Alternative Q5
+```{r}
+good_guys <- 
+  superhero_info %>% 
+  filter(alignment=="good")
+```
+
+```{r}
+bad_guys <- 
+  superhero_info %>% 
+  filter(alignment=="bad")
+```
+
 
 6. For the good guys, use the `tabyl` function to summarize their "race".
 ```{r}
@@ -136,6 +171,10 @@ good_guys %>%
 #this method doesn't involve pipes
 ```
 
+#Alternative Q6 
+```{r}
+good_guys %>% tabyl(race)
+```
 
 7. Among the good guys, Who are the Vampires?
 ```{r}
@@ -149,6 +188,11 @@ good_guys %>%
 ```
 
 **The vampires are Angel and Blade.** 
+
+#Alternative Q7 
+```{r}
+good_guys %>% filter(race=="Vampire")
+```
 
 8. Among the bad guys, who are the male humans over 200 inches in height?
 ```{r}
@@ -164,6 +208,10 @@ bad_guys %>%
 #This code doesn't involve pipes. 
 ```
 
+#Alternative Q8 
+```{r}
+bad_guys %>% filter(race=="Human" & gender=="Male" & height>=150)
+```
 
 9. Are there more good guys or bad guys with green hair? 
 ```{r}
@@ -184,6 +232,40 @@ bad_guys %>%
 ```
 **There are more good guys (7good vs. 1bad) with Green hair.** 
 
+#Alternative Q9 
+```{r}
+good_guys %>% 
+  filter(hair_color=="Green")
+```
+
+```{r}
+bad_guys %>% 
+  filter(hair_color=="Green")
+```
+
+```{r}
+table(superhero_info$hair_color, superhero_info$alignment)
+```
+
+```{r}
+superhero_info %>% 
+  tabyl(hair_color, alignment)
+```
+
+```{r}
+superhero_info %>% 
+  filter(hair_color=="Green") %>% 
+  group_by(alignment) %>% 
+  summarise(n=n())
+```
+
+```{r}
+superhero_info %>% 
+  filter(hair_color=="Green") %>% 
+  count(hair_color, alignment)
+```
+
+
 10. Let's explore who the really small superheros are. In the `superhero_info` data, which have a weight less than 50? Be sure to sort your results by weight lowest to highest.  
 ```{r}
 superhero_info %>% 
@@ -191,6 +273,12 @@ superhero_info %>%
   arrange(weight) #sorts the weight from lowest to highest
 ```
 
+#Alternative Q10 
+```{r}
+superhero_info %>% 
+  filter(weight<50) %>% 
+  arrange(weight)
+```
 
 11. Let's make a new variable that is the ratio of height to weight. Call this variable `height_weight_ratio`. 
 ```{r}
@@ -200,8 +288,22 @@ superhero_info %>%
   arrange(desc(height_weight_ratio))
 ```
 
+#Alternative Q11
+```{r}
+superhero_info <- 
+  superhero_info %>% 
+  mutate(height_weight_ratio=height/weight)
+```
+
 12. Who has the highest height to weight ratio?  
 **Groot has the highest height to weight ratio at a height of 701 and weight of 4.**
+
+#Alternative Q12
+```{r}
+superhero_info %>% 
+  arrange(desc(height_weight_ratio))
+```
+
 
 ## `superhero_powers`
 Have a quick look at the `superhero_powers` data frame.  
@@ -239,6 +341,19 @@ superhero_powers %>%
 
 **There are 40 superheros that have a combination of agility, stealth, super_strength, stamina.**
 
+#Alternative Q13
+```{r}
+superhero_powers %>%
+  filter(agility & stealth & super_strength & stamina) %>%
+  select(hero_names, agility, stealth, super_strength, stamina)
+```
+
+```{r}
+superhero_powers %>% 
+  select(hero_names, agility, stealth, super_strength, stamina) %>% 
+  filter(agility==TRUE & stealth==TRUE & super_strength==TRUE & stamina==TRUE)
+```
+
 ## Your Favorite
 14. Pick your favorite superhero and let's see their powers!  
 ```{r}
@@ -257,6 +372,12 @@ names(groot_powers)
 #This is a way to do it without pipes
 ```
 
+#Alternative Q14 
+```{r}
+superhero_powers %>%
+  filter(hero_names == "Darth Vader") %>%
+  select_if(all)  # Selects all columns where all values are TRUE
+```
 
 15. Can you find your hero in the superhero_info data? Show their info!
 ```{r}
@@ -269,6 +390,11 @@ superhero_info %>%
 #This is another way to do it without pipes
 ```
 
+#Alternative Q15
+```{r}
+superhero_info %>% 
+  filter(name=="Darth Vader")
+```
 
 ## Push your final code to GitHub!
 Please be sure that you check the `keep md` file in the knit preferences.  

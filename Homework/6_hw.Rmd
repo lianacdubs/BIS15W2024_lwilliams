@@ -59,6 +59,22 @@ Outputs the data classes of the variables
 glimpse(fisheries)
 ```
 
+#Alternative answer
+```{r}
+#glimpse(fisheries)
+```
+
+```{r}
+#head(fisheries)
+```
+
+```{r}
+#tail(fisheries)
+```
+
+```{r}
+#str(fisheries)
+```
 2. Use `janitor` to rename the columns and make them easier to use. As part of this cleaning step, change `country`, `isscaap_group_number`, `asfis_species_number`, and `fao_major_fishing_area` to data class factor. 
 ```{r}
 fisheries <- clean_names(fisheries) #clean the data. 
@@ -76,7 +92,24 @@ fisheries$fao_major_fishing_area <- as.factor(fisheries$fao_major_fishing_area)
 #The $ allows access to one variable in a data set.
 ```
 
+#Alternative to Q#2
+```{r}
+#fisheries <- janitor::clean_names(fisheries)
+#names(fisheries)
+```
 
+```{r}
+#fisheries$country <- as.factor(fisheries$country)
+#fisheries$isscaap_group_number <- as.factor(fisheries$isscaap_group_number)
+#fisheries$asfis_species_number <- as.factor(fisheries$asfis_species_number)
+#fisheries$fao_major_fishing_area <- as.factor(fisheries$fao_major_fishing_area)
+```
+
+Here is a nice alternate way to change classes using dplyr.  
+```{r}
+#fisheries <- 
+  #fisheries %>% mutate(across(c(country, isscaap_group_number, asfis_species_number, fao_major_fishing_area), as_factor))
+```
  
 We need to deal with the years because they are being treated as characters and start with an X. We also have the problem that the column names that are years actually represent data. We haven't discussed tidy data yet, so here is some help. You should run this ugly chunk to transform the data for the rest of the homework. It will only work if you have used janitor to rename the variables in question 2!  
 ```{r}
@@ -109,6 +142,16 @@ fisheries_tidy %>%
   count(country) #This is a count for the list of country names
 ```
 
+#Alternative to Q3 
+```{r}
+#fisheries_tidy %>% 
+  #summarize(ncountries = n_distinct(country))
+```
+
+```{r}
+#levels(fisheries_tidy$country)
+```
+
 4. Refocus the data only to include country, isscaap_taxonomic_group, asfis_species_name, asfis_species_number, year, catch.
 ```{r}
 fisheries_new <- fisheries_tidy %>% 
@@ -116,6 +159,12 @@ fisheries_new <- fisheries_tidy %>%
 fisheries_new
 ```
 
+#Alternative to Q4 
+```{r}
+#fisheries_tidy_focused <- fisheries_tidy %>% 
+  #select(country, isscaap_taxonomic_group, asfis_species_name, asfis_species_number, year, catch)
+#fisheries_tidy_focused
+```
 5. Based on the asfis_species_number, how many distinct fish species were caught as part of these data?
 ```{r}
 fisheries_new %>%
@@ -123,9 +172,10 @@ fisheries_new %>%
 ```
 **1551 species were caught as part of the data**
 
+#Alternative to Q5 
 ```{r}
-#n_distinct(fisheries_tidy$asfis_species_number)  
-#This is another way to solve. 
+#fisheries_tidy_focused %>% 
+  #summarize(n_taxa=n_distinct(asfis_species_number))
 ```
 
 6. Which country had the largest overall catch in the year 2000?
@@ -139,6 +189,15 @@ fisheries_new %>%
 ```
 **The country with the largest overall catch in the year 2000 was China. 25,899 fish were caught!**
 
+#Alternative to Q6 
+```{r}
+#fisheries_tidy_focused %>% 
+  #filter(year==2000) %>%
+  #group_by(country) %>% 
+  #summarize(catch_total=sum(catch, na.rm=T)) %>% 
+  #arrange(desc(catch_total))
+```
+
 7. Which country caught the most sardines (_Sardina pilchardus_) between the years 1990-2000?
 ```{r}
 fisheries_new %>% 
@@ -149,6 +208,44 @@ fisheries_new %>%
 ```
 
 **The country that caught the most sardines between 1990-2000 was Morocco with 7,470 sardines.**
+
+#Alternative to Q7 
+```{r}
+#fisheries_tidy_focused %>% 
+  #filter(asfis_species_name== "Sardina pilchardus") %>% 
+  #filter(year>=1990 & year<=2000) %>% 
+  #group_by(country) %>% 
+  #summarize(catch_total=sum(catch, na.rm=T)) %>% 
+  #arrange(desc(catch_total))
+```
+
+Double check
+```{r}
+#sardines1 <- fisheries_tidy_focused %>% 
+  #filter(stringr::str_detect(asfis_species_name, "Sardina")) %>% 
+  #filter(year>=1990 & year<=2000)
+```
+
+```{r}
+#sardines1 %>% 
+  #group_by(country) %>% 
+  #summarize(catch_total=sum(catch, na.rm=T)) %>% 
+  #arrange(desc(catch_total))
+```
+
+Triple check
+```{r}
+#sardines2 <- fisheries_tidy_focused %>% 
+  #filter(stringr::str_detect(isscaap_taxonomic_group, "sardines")) %>% 
+  #filter(year>=1990 & year<=2000)
+```
+
+```{r}
+#sardines2 %>% 
+  #group_by(country) %>% 
+  #summarize(catch_total=sum(catch, na.rm=T)) %>% 
+  #arrange(desc(catch_total))
+```
 
 8. Which five countries caught the most cephalopods between 2008-2012?
 ```{r}
@@ -161,6 +258,22 @@ fisheries_new %>%
 ```
 **Five countries that caught the most cephalopods between 2008-2012 is India, China, Spain, Algeria, and France in that order**
 
+#Alternative to Q8 
+```{r}
+#fisheries_tidy_focused %>% 
+  #filter(str_detect(isscaap_taxonomic_group, "Squids")) %>% 
+  #filter(year>=2008 & year<=2012) %>% 
+  #group_by(country) %>% 
+  #summarize(catch_total=sum(catch, na.rm=T)) %>% 
+  #arrange(desc(catch_total))
+```
+
+```{r}
+#fisheries_tidy_focused %>% 
+  #filter(isscaap_taxonomic_group=="Squids, cuttlefishes, octopuses") %>% 
+  #count(asfis_species_name, sort=T)
+```
+
 9. Which species had the highest catch total between 2008-2012? (hint: Osteichthyes is not a species)
 ```{r}
 fisheries_new %>% 
@@ -169,6 +282,15 @@ fisheries_new %>%
   summarize(total_catch = sum(catch, na.rm = T)) %>% #find the total number of fish caught btwn 2008-2012
   arrange(desc(total_catch)) #the species that was caught the most is at the top
   
+```
+
+#Alternative to Q9
+```{r}
+#fisheries_tidy_focused %>% 
+  #filter(year>=2008 & year<=2012)%>% 
+  #group_by(asfis_species_name) %>% 
+  #summarize(catch_total=sum(catch, na.rm=T)) %>% 
+  #arrange(desc(catch_total))
 ```
 
 10. Use the data to do at least one analysis of your choice.

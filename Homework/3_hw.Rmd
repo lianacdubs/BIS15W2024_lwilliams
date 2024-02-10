@@ -31,6 +31,12 @@ sleep <- data.frame(msleep)
 sleep
 ```
 
+#Alternative to Q2 
+```{r}
+sleep <- msleep
+is.data.frame(msleep)
+```
+
 3. What are the dimensions of this data frame (variables and observations)? How do you know? Please show the *code* that you used to determine this below.  
 ```{r}
 dim(sleep)
@@ -38,12 +44,22 @@ dim(sleep)
 
 There are 11 variables and 83 observations. This is also seen in the environment window for the object sleep.
 
+#Alternative Q3 
+```{r}
+glimpse(sleep)
+```
+
 4. Are there any NAs in the data? How did you determine this? Please show your code.  
 ```{r}
 any(is.na(sleep))
 ```
 
 Yes, there are NAs in the data. The True output from anyNA means that there are NA in a vector. The is.na checks which values of the vectors that R notices as missing.
+
+#Alternative Q4 
+```{r}
+anyNA(sleep)
+```
 
 5. Show a list of the column names is this data frame.
 ```{r}
@@ -68,6 +84,12 @@ large <- sleep[sleep$bodywt >=200,]
 large
 ```
 
+#Alternative Q7 
+```{r}
+small <- filter(sleep, bodywt<=1)
+large <- filter(sleep, bodywt>=200)
+```
+
 8. What is the mean weight for both the small and large mammals?
 ```{r}
 small_mean <- mean(small$bodywt)
@@ -78,6 +100,16 @@ small_mean
 large_mean <- mean(large$bodywt)
 large_mean
 ```
+
+#Alternative Q8 
+```{r}
+mean(small$bodywt, na.rm = T)
+```
+
+```{r}
+mean(large$bodywt, na.rm = T)
+```
+
 9. Using a similar approach as above, do large or small animals sleep longer on average?  
 
 ```{r}
@@ -90,6 +122,15 @@ large_sleep_mean <- mean(large$sleep_total)
 large_sleep_mean
 ```
 On average, small animals sleep longer than large animals based on the data. 
+
+#Alternative Q9 
+```{r}
+mean(large$sleep_total, na.rm = T)
+```
+
+```{r}
+mean(small$sleep_total, na.rm = T)
+```
 
 10. Which animal is the sleepiest among the entire dataframe?
 ```{r}
