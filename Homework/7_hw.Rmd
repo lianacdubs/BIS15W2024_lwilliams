@@ -105,7 +105,9 @@ Yes, NAs in the amphibio dataset, 170566 total. It doesn't make sense since ther
 amniota <- amniota %>% 
   replace_with_na_all(condition = ~.x == -999)
 ```
+
 All the values the end with body_mass_g have 0 for their minimum value which isn't biologically accurate. 
+
 ```{r}
 amniota %>% 
   select(female_body_mass_g, male_body_mass_g, no_sex_body_mass_g, adult_body_mass_g) %>% 
