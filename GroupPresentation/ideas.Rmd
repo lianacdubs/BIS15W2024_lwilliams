@@ -1,0 +1,43 @@
+---
+title: "Brainstorm"
+author: "Liana Williams"
+date: "2024-02-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#idea 1 
+```{r}
+[Swimming Endurance Clown Fish](https://www.bco-dmo.org/dataset/739171) #inspired by Clownfish in Finding Nemo; not too long
+```
+
+#idea 2 **this is a funny idea **
+```{r}
+[Central Park Squirrels](https://data.cityofnewyork.us/Environment/2018-Central-Park-Squirrel-Census-Squirrel-Data/vfnx-vebw/about_data)
+#This table contains squirrel data for each of the 3,023 sightings, including location coordinates, age, primary and secondary fur color, elevation, activities, communications, and interactions between squirrels and with humans.
+```
+
+#idea 3
+```{r}
+[Zooplankton Database](https://www.bco-dmo.org/dataset/526852) #good amount of quantitative vs. categorical data 
+```
+
+#idea 4
+```{r}
+[Sixgill Shark Data](https://www.webapps.nwfsc.noaa.gov/apex/parrdata/inventory/tables/table/sixgill_shark_data)
+#Movement and habitats use patterns of top predators and keystone species in the benthic food web. ; 65,000 observations lol
+```
+
+#idea 5 **this is a funny idea**
+```{r}
+[toilets australia] (https://data.gov.au/dataset/ds-dga-553b3049-2b8b-46a2-95e6-640d7986a8c1/details) #details of every public toilet in Australia
+```
+
+
+##Project Requirements  
+Each group will prepare a short 5-7 minute presentation of their work. There should be a theme or "story" that can be shared, i.e. what were the big questions, challenges, and tools that you used? Did you learn an interesting new package or method that can be shared?
+
+
