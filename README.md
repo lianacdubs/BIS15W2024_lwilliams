@@ -64,9 +64,34 @@ Get Started in R, RStudio, GitHub
 2. Learn helpful new functions that are part of the `janitor` package.  
 ## Lab 7.1 
 1. Use a combination of `select()`, `filter()`, and `mutate()` to transform data frames.  
-2. Use the `skimr` package to produce summaries of data.  
-3. Produce clean summaries of data using `summarize()`.  
-4. Use `group_by()` in combination with `summarize()` to produce grouped summaries of data.  
-##Lab 7.2 
+2. Use the `skimr` package to produce summaries of data.
+3. Produce clean summaries of data using `summarize()`.
+4. Use `group_by()` in combination with `summarize()` to produce grouped summaries of data.
+## Lab 7.2
 1. Produce clear, concise summaries using a variety of functions in `dplyr` and `janitor.`  
+2. Use the `across()` operator to produce summaries across multiple variables.
+## Lab 8.1  
+1.approaches to solving common problems in R.    
 2. Use the `across()` operator to produce summaries across multiple variables.  
+## Lab 8.2  
+1. Define `NA` and describe how they are treated in R.  
+2. Produce summaries of the number of NA's in a data set.   
+3. Replace values with `NA` in a data set as appropriate.  
+## Lab 9.1  
+1. Explain the difference between tidy and messy data.  
+2. Evaluate a data set as tidy or messy.    
+3. Use the `pivot_longer()` function of `tidyr` to transform data from wide to long format.  
+4. Use `separate()` to split observations within a column.
+## Lab 9.2  
+1. Explain the difference between tidy and messy data.  
+2. Evaluate a data set as tidy or untidy.  
+3. Use the `pivot_wider()` function of `tidyr` to transform data from long to wide format.
+## Lab 10.1
+1. Understand and apply the syntax of building plots using `ggplot2`.  
+2. Build a boxplot using `ggplot2`.  
+3. Build a scatterplot using `ggplot2`.  
+4. Build a barplot using `ggplot2` and show the difference between `stat=count` and `stat=identity`.
+## Lab 10.2
+1. Produce boxplots using `ggplot.`  
+2. Customize labels on axes using `labs` and `themes`.  
+3. Use `color`, `fill`, and `group` to customize plots and improve overall aesthetics.  
