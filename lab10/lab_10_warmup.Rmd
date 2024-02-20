@@ -26,6 +26,7 @@ malaria <- read_csv("data/malaria.csv") %>% clean_names()
 ```{r}
 names(malaria)
 ```
+
 ```{r}
 head(malaria) #age range is specified for those cases because column names contain information. 
 ```

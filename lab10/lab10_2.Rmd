@@ -60,6 +60,7 @@ names(penguins)
 penguins %>% 
   count(species) #for a straight count use geombar 
 ```
+
 ```{r}
 penguins %>% 
   count(species) %>% 
@@ -124,6 +125,7 @@ homerange %>%
   group_by(trophic.guild) %>% #take all the trophic and put them together 
   summarize(mean_log10.mass=mean(log10.mass)) #summarize to get x and y 
 ```
+
 ```{r}
 homerange %>% 
   group_by(trophic.guild) %>% #take all the trophic and put them together 
@@ -132,6 +134,7 @@ homerange %>%
   geom_col()
 #this creates a bar plot! 
 ```
+
 ```{r}
 #We can also make a boxplot 
 homerange %>% 

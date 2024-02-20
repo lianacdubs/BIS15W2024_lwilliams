@@ -123,7 +123,7 @@ names(homerange)
 ```{r}
 ggplot(data=homerange, #specify the data
        mapping=aes(x=log10.mass, y=log10.hra))+ #map the aesthetics
-  geom_point() #add the plot type
+  geom_point() #add the plot type; this is a scatterplot
 #as mass goes up the homerange increases 
 ```
 
@@ -184,6 +184,7 @@ homerange %>%
   ggplot(aes(y=common.name, x=log10.mass))+ #notice the switch in x and y
   geom_col()
 ```
+
 ```{r}
 homerange %>% 
   filter(family=="salmonidae") %>%

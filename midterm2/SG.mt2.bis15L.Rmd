@@ -1,0 +1,324 @@
+---
+title: "sg2_midterm"
+author: "Liana Williams"
+date: "2024-02-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Hw 8 to... (double check with profs answers )
+#Lab 8 to...
+
+#Lab 8.1 
+Let's say we were interested in how body mass varied by island. It is reasonable to assume that the islands are different, so maybe the penguins are as well.
+```{r}
+penguins %>% 
+  group_by(island) %>% 
+  summarize(mean_body_mass_g=mean(body_mass_g, na.rm=T)) # remember to remove those NA's!
+```
+
+What if we are interested in the number of observations (penguins) by species and island?
+```{r}
+penguins %>% 
+  group_by(island, species) %>% 
+  summarize(n_penguins=n(), .groups = 'keep')
+```
+
+##Count : shows the number of observations
+```{r}
+penguins %>% 
+  count(island, species)
+```
+Note: **tabyl** will also produce counts
+
+##Across()
+```{r}
+penguins %>%
+  summarize(across(c(species, island, sex), n_distinct))
+```
+
+All variables that include "bill"...all of the other dplyr operators also work.
+```{r}
+penguins %>%
+  summarise(across(starts_with("bill"), n_distinct))
+```
+Summarize across all variables 
+```{r}
+penguins %>%
+  summarise_all(n_distinct)
+```
+
+#Lab 8.2 
+Here is a new one for you using the `purrr` package. This will give you a quick summary of the number of NA's in each variable.
+```{r}
+life_history %>% 
+  map_df(~ sum(is.na(.))) #tell where all the NAs ; R doesn't see -999 as NAs 
+```
+
+## `naniar`
+`naniar` is a package that is built to manage NA's. Many of the functions it performs can also be performed using tidyverse functions, but it does provide some interesting alternatives. 
+
+`miss_var_summary` provides a clean summary of NA's across the data frame.
+```{r}
+naniar::miss_var_summary(life_history) #use naniar package and get a missing variable summary of the life_history
+#pct is the percent missing
+```
+
+Note: sometimes NAs can be represented as different numbers. 
+Let's use `mutate()` and `na_if()` to replace 0's with NA's in `max_life`.
+```{r}
+life_history_no_nas <- life_history_no_nas %>% 
+  mutate(max_life=na_if(max_life, 0))
+```
+
+We can also use `miss_var_summary` with `group_by()`. This helps us better evaluate where NA's are in the data.
+```{r}
+life_history %>%
+  group_by(order) %>%
+  #select(order, wean_mass) %>% 
+  miss_var_summary(order=T)
+```
+
+`naniar` also has a nice replace function which will allow you to precisely control which values you want replaced with NA's in each variable.
+```{r}
+life_history %>% 
+  replace_with_na(replace = list(newborn = "not measured", 
+                                 weaning= -999, 
+                                 wean_mass= -999, 
+                                 afr= -999, 
+                                 max_life= 0, 
+                                 litter_size= -999, 
+                                 gestation= -999, 
+                                 mass= -999)) %>% 
+miss_var_summary()
+#makes replacement of NA's specific to a variable
+```
+
+You can also use naniar to replace a specific value (like -999) with NA across the entire data set.  
+```{r}
+life_history %>% #going back to the original data
+  replace_with_na_all(condition = ~.x == -999)%>% 
+miss_var_summary()
+```
+
+Finally, naniar has some built-in examples of common values or character strings used to represent NA's. The chunk below will use these built-in parameters to replace NA's across the entire data set.
+```{r}
+common_na_strings
+```
+
+```{r}
+common_na_numbers
+```
+
+```{r}
+life_history %>% #going back to the original data
+  replace_with_na_all(condition = ~.x %in% c(common_na_strings, common_na_numbers)) %>% 
+  mutate(newborn=na_if(newborn, "not measured"))
+```
+
+## Visualizing NAs
+There is another package `visdat` that can be used to visualize the proportion of different classes of data, including missing data. But, it is limited by size.
+
+## Dealing with NA's in advance
+If you are sure that you know how NA's are treated in the data, then you can deal with them in advance using `na()` as part of the `readr` package.
+
+#Alternative
+```{r}
+read_csv(file = "data/mammal_lifehistories_v3.csv", na = c("NA", " ", ".", "-999", "not measured")) %>% clean_names()
+```
+
+#Lab 9.1 
+https://cran.r-project.org/web/packages/tidyr/vignettes/pivot.html
+##Pivot data from wide to long.  
+pivot_longer() "lengthens" data, increasing the number of rows and decreasing the number of columns.
+```{r}
+#pivot_longer() makes datasets LONGER by increasing
+#^This command shifts data from wide to long
+#The problem is that column names may represent values of a variable! 
+```
+Rules:  
++ `pivot_longer`(cols, names_to, values_to)
++ `cols` - Columns to pivot to longer format
++ `names_to` - Name of the new column; it will contain the column names of gathered columns as values
++ `values_to` - Name of the new column; it will contain the data stored in the values of gathered columns
+
+***REVIEW 9.1 EXAMPLE***
+***LAB10 Warmup***
+Simulated malaria data #Load the data 
+```{r}
+malaria <- read_csv("data/malaria.csv") %>% clean_names()
+```
+
+```{r}
+names(malaria)
+```
+
+```{r}
+head(malaria) #age range is specified for those cases because column names contain information. 
+```
+
+#rdt refers to rapid diagnostic test 
+##Data tidy
+Pivot longer
+```{r}
+malaria_long <- malaria %>% 
+  pivot_longer(cols=starts_with("malaria_rdt"),
+               names_to = "age_class",
+               values_to = "cases") %>% 
+  select(newid, data_date, submitted_date, location_name, province, district, age_class, cases)
+```
+^There is still work to make these cleaner like age_class is ugly. 
+
+Which district had the highest number of cases on July 30, 2020?
+```{r}
+malaria_long %>% 
+  filter(data_date=="2020-07-30") %>% 
+  group_by(district) %>% 
+  summarize(tot_cases=sum(cases, na.rm=T)) %>% 
+  arrange(-tot_cases) #this is another way to do descending order. 
+```
+
+
+
+##Tidy Data 
+REVIEW CHAPTER 12 
+[chapter 12 of the data science text](https://r4ds.had.co.nz/tidy-data.html)
+`Tidy` data follows three conventions:   
+(1) each variable has its own column  
+(2) each observation has its own row  
+(3) each value has its own cell  
+
+## Example 3: more than one variable in a column name
+Example: exp1rep1
+
+#Lab 9.2 
+##pivot data from long to wide 
+pivot_wider() "widens" data, increasing the number of columns and decreasing the number of rows.
+```{r}
+#column namess are the problem. there is (more than one) value per cell and the columns represent values.
+```
+
+You use `pivot_wider()` when you have an observation scattered across multiple rows. In the example below, `cases` and `population` represent variable names not observations.  
+
+Rules:  
++ `pivot_wider`(names_from, values_from)  
++ `names_from` - Values in the `names_from` column will become new column names  
++ `values_from` - Cell values will be taken from the `values_from` column  
+
+```{r}
+tb_data %>% 
+  pivot_wider(names_from = "key", #the observations under key will become new columns; key have two names cases and population
+              values_from = "value") #the values under value will be moved to the new columns
+```
+
+Example Pivot_Wider
+```{r}
+gene_exp <- read_csv("data/gene_exp.csv")
+gene_exp
+```
+#there are more than one variable in a column (treatment and control)
+```{r}
+gene_exp %>% 
+  pivot_wider(names_from = "type", #has two values in the type column which are  treatment and control
+              values_from = "L4_values")
+```
+
+`separate()` needs to know which column you want to split, the names of the new columns, and what to look for in terms of breaks in the data.
+```{r}
+heartrate2 %>% 
+  separate(patient, into= c("patient", "sex"), sep = "_") #separate patient into two new variables patient and sex
+```
+
+`unite()` is the opposite of separate(). Its syntax is straightforward. You only need to give a new column name and then list the columns to combine with a separation character. 
+```{r}
+heartrate3 %>% 
+  unite(patient_sex, "patient", "sex", sep=" ") #not super common but, could be a way to present the data
+```
+
+#Lab 10.1 
+ [ggplot2 cheatsheet](https://posit.co/resources/cheatsheets/)  ; this is apart of the tidyverse
+ 
+In short, **plot= data + geom_ + aesthetics**.  
+
+#think of geom as type like box plot, dot plot etc. 
+#aesthetics can be like what the x and y axis are etc. 
+```{r}
+ggplot(data=iris, #specify the data
+       mapping=aes(x=Species, y=Petal.Length))+ #map the aesthetics
+  geom_boxplot() #add the plot type
+```
+
+## Data Types 
++ `discrete` quantitative data that only contains integers
++ `continuous` quantitative data that can take any numerical value
++ `categorical` qualitative data that can take on a limited number of values
+
+```{r}
+ggplot(data=homerange, #specify the data
+       mapping=aes(x=log10.mass, y=log10.hra))+ #map the aesthetics
+  geom_point() #add the plot type; this is a scatterplot
+#as mass goes up the homerange increases 
+```
+
+`geom_jitter()` is similar to `geom_point()` but it helps with over plotting by adding some random noise to the data and separating some of the individual points.
+```{r}
+ggplot(data=homerange, mapping=aes(x=log10.mass, y=log10.hra))+
+  geom_jitter() #adds some random noise
+#if the dataset is super big could be a problem called overplotting. 
+```
+
+To add a regression (best of fit) line, we just add another layer.
+```{r}
+ggplot(data=homerange, mapping=aes(x=log10.mass, y=log10.hra))+
+  geom_point()+
+  geom_smooth(method=lm, se=T) #add a regression line
+```
+#There is a warning if leave geom_point() empty ^. if you don't put na.rm=t; by default ggplot will pull these out
+
+### Bar Plot: `geom_bar()`
+The simplest type of bar plot counts the number of observations in a categorical variable.
+
+Also notice that we can use pipes! The `mapping=` function is implied by `aes` and so is often left out. 
+```{r}
+homerange %>% 
+  ggplot(aes(x=trophic.guild)) + #there is only one variable in this plot. noteL the x= is not needed. 
+  geom_bar() #good for counts
+```
+#You cannot make a bar plot with continuous data. 
+
+### Bar Plot: `geom_col()`
+Unlike `geom_bar()`, `geom_col()` allows us to specify an x-axis and a y-axis.
+```{r}
+homerange %>% 
+  filter(family=="salmonidae") %>%
+  select(common.name, log10.mass) %>% 
+  ggplot(aes(y=common.name, x=log10.mass))+ #notice the switch in x and y
+  geom_col()
+```
+
+Make a bar plot that shows the masses of the top 10 smallest mammals.
+```{r}
+homerange %>% 
+  filter(class=="mammalia") %>% 
+  top_n(-10, log10.mass) %>% 
+  ggplot(aes(x=common.name, y=log10.mass))+
+  geom_col()+
+coord_flip() #add a + at the end of each layer
+```
+
+coord_flip() this switches the x and y axis
+
+#Lab 10.2 
+***Good Examples***
+Boxplots help us visualize a range of values. So, on the x-axis we typically have something categorical and the y-axis is the range.
+
+`geom_boxplot()` is the geom type for a standard box plot. The center line in each box represents the median, not the mean.
+```{r}
+homerange %>% 
+  ggplot(aes(x = class, y = log10.mass)) +
+  geom_boxplot() #shows the same information as the code chunk above. 
+#Note: the line in the middle is the median. 
+```

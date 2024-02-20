@@ -35,7 +35,7 @@ Recall that we use `pivot_longer()` when our column names actually represent var
 datasets::USPersonalExpenditure
 ?USPersonalExpenditure
 ```
-#the years are column names. we need an X or we need a why. 
+#the years are column names. we need an X or we need a y. 
 Here we add a new column of expenditure types, which are stored as rownames above, with `mutate()`. The `USPersonalExpenditures` data also needs to be converted to a data frame before we can use the tidyverse functions, because it comes as a matrix.
 ```{r}
 expenditures <- USPersonalExpenditure %>% 
@@ -62,7 +62,7 @@ expenditures %>%
                names_to = "year",
                values_to = "bn_dollars") %>% 
   filter(expenditure=="Medical and Health") %>% 
-  arrange(-bn_dollars)
+  arrange(-bn_dollars) #the negative sign is the same as desc
 ```
 
 3. Restrict the data to private education only. Sort in ascending order.
