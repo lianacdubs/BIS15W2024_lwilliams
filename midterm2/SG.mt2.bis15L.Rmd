@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #Hw 8 to... (double check with profs answers )
 #Lab 8 to...
+#Review when to use each plot type
 
 #Lab 8.1 
 Let's say we were interested in how body mass varied by island. It is reasonable to assume that the islands are different, so maybe the penguins are as well.
@@ -264,6 +265,7 @@ ggplot(data=homerange, #specify the data
 ```
 
 `geom_jitter()` is similar to `geom_point()` but it helps with over plotting by adding some random noise to the data and separating some of the individual points.
+#geom_jitter() can be be used for scatter plot
 ```{r}
 ggplot(data=homerange, mapping=aes(x=log10.mass, y=log10.hra))+
   geom_jitter() #adds some random noise
@@ -322,3 +324,7 @@ homerange %>%
   geom_boxplot() #shows the same information as the code chunk above. 
 #Note: the line in the middle is the median. 
 ```
+
+#Lab 11.1 
+
+#Lab 11.2 
