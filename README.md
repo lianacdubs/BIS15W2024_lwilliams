@@ -66,7 +66,7 @@ Get Started in R, RStudio, GitHub
 1. Use a combination of `select()`, `filter()`, and `mutate()` to transform data frames.  
 2. Use the `skimr` package to produce summaries of data.  
 3. Produce clean summaries of data using `summarize()`.  
-4. Use `group_by()` in combination with `summarize()` to produce grouped summaries of data.  
-##Lab 7.2 
+4. Use `group_by()` in combination with `summarize()` to produce grouped summaries of data.
+## Lab 7.2
 1. Produce clear, concise summaries using a variety of functions in `dplyr` and `janitor.`  
 2. Use the `across()` operator to produce summaries across multiple variables.  
