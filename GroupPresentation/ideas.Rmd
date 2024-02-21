@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-#idea 1 
+#idea 1 (APPROVED BY PROF!) ; HAS A RESEARCH ARTICLE ASSOCIATED
 ```{r}
 [Swimming Endurance Clown Fish](https://www.bco-dmo.org/dataset/739171) #inspired by Clownfish in Finding Nemo; not too long
 ```
@@ -20,20 +20,15 @@ knitr::opts_chunk$set(echo = TRUE)
 #This table contains squirrel data for each of the 3,023 sightings, including location coordinates, age, primary and secondary fur color, elevation, activities, communications, and interactions between squirrels and with humans.
 ```
 
-#idea 3
-```{r}
-[Zooplankton Database](https://www.bco-dmo.org/dataset/526852) #good amount of quantitative vs. categorical data 
-```
-
-#idea 4
-```{r}
-[Sixgill Shark Data](https://www.webapps.nwfsc.noaa.gov/apex/parrdata/inventory/tables/table/sixgill_shark_data)
-#Movement and habitats use patterns of top predators and keystone species in the benthic food web. ; 65,000 observations lol
-```
-
-#idea 5 **this is a funny idea**
+#idea 3 **this is a funny idea**
 ```{r}
 [toilets australia] (https://data.gov.au/dataset/ds-dga-553b3049-2b8b-46a2-95e6-640d7986a8c1/details) #details of every public toilet in Australia
+```
+
+
+#idea 4 (kinda boring ngl)
+```{r}
+[Zooplankton Database](https://www.bco-dmo.org/dataset/526852) #good amount of quantitative vs. categorical data 
 ```
 
 
