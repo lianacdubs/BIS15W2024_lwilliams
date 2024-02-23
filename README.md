@@ -96,3 +96,18 @@ Get Started in R, RStudio, GitHub
 1. Produce boxplots using `ggplot.`  
 2. Customize labels on axes using `labs` and `themes`.  
 3. Use `color`, `fill`, and `group` to customize plots and improve overall aesthetics.  
+##Lab 11.1  
+1. Produce box plots using `ggplot.`  
+2. Customize labels on axes using `labs` and `themes`.  
+3. Use `color`, `fill`, and `group` to customize plots and improve aesthetics.  
+##Lab 11.2  
+1. Build stacked bar plots of categorical variables.  
+2. Build side-by-side barplots using `position= "dodge"`.  
+##Lab 12.1  
+1. Build histograms and density plots.
+2. Adjust colors using R's built-in color options.  
+3. Create new categories with `case_when()` and use those categories to build plots.  
+4. Build line plots. 
+##Lab 12.2  
+1. Adjust the aesthetics of plots in ggplot using `themes`, `RColorBrewer`, and `paletteer.`  
+2. Use faceting to produce multi-panel plots.  

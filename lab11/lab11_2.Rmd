@@ -145,12 +145,12 @@ penguins %>%
 2. Make another bar plot that shows the number of individuals by sex on each island?
 ```{r}
 penguins %>% 
-  #INSERT THE FILTER FUNCTION HERE 
-  ggplot(aes(x = island, fill=sex))+
-  geom_bar(position = "dodge")+ #has side by side
-  labs(title = "Counts of Individuals by Island",
-       x = "Island",
-       fill = "Species")
+  #filter(sex!="NA") %>% # this removes the NA's
+  ggplot(aes(x=island, fill=sex))+
+  geom_bar(position="dodge")+
+  labs(title="Counts of Individuals by Island",
+       x="Island",
+       fill="Penguin Species")
 ```
 
 ## Using `group`
@@ -177,6 +177,7 @@ homerange %>%
 #group and fill do the same thing but, group doesn't color in the taxon.
   geom_boxplot()
 ```
+
 ```{r}
 homerange %>% 
   ggplot(aes(x = class, y = log10.mass, group = taxon, fill=taxon)) + 

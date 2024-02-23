@@ -85,12 +85,11 @@ Lastly, we can adjust the x-axis labels to make them more readable. We do this u
 ```{r}
 life_history %>% 
   group_by(order) %>% 
-  summarize(mean_mass = mean(mass, na.rm = T)) %>% 
-  ggplot(aes(x=reorder(order, mean_mass), y=mean_mass))+ ##fix this error
+  summarize(mean_mass=mean(mass, na.rm=T)) %>% 
+  ggplot(aes(x=reorder(order, mean_mass), y=mean_mass))+ #reorder the x-axis
   geom_col()+
   coord_flip()+
   scale_y_log10()
-##DOUBLE CHECK THIS
 ```
 
 ## Scatterplots
@@ -100,7 +99,6 @@ life_history %>%
   ggplot(aes(x=gestation, y=wean_mass))+
   geom_jitter(na.rm = T)+ #prevents overplotting 
   scale_y_log10() #add this at the end for the outlier before including this line
-
 ```
 
 ## Boxplots
@@ -139,7 +137,7 @@ The plot looks clean, but it is incomplete. A reader unfamiliar with the data mi
 elephants %>% 
   ggplot(aes(x=age, y=height)) + 
   geom_point() + 
-  geom_smooth(method=lm, se=F)+
+  geom_smooth(method=lm, se=F)+ #method is linear model, dont show standard error 
   labs(title="Elephant Age vs. Height",
        x="Age",
        y="Height")

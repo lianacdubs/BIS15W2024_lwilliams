@@ -162,7 +162,7 @@ p+scale_fill_brewer(palette = "Paired")+
 ## Practice
 1. Keep using the `same `q` plot, but test out one of R Color Brewer palettes.
 ```{r}
-q+scale_color_brewer(palette = "PuBu")+ #FIX THIS LINE OF CODE
+q+scale_colour_brewer(palette = "PuBuGn")
 ```
 
 ## Manually Setting Colors
@@ -235,12 +235,16 @@ homerange %>%
   theme(axis.text.x = element_text(angle = 60, hjust=1))
 ```
 
-**FINISH AT HOME**
+**Update and try these** 
 
 ## Practice
 1. Use facet_wrap to compare the distribution of `log10.mass` by `thermoregulation`.
 ```{r}
-
+homerange %>% 
+  ggplot(aes(x=taxon, y=log10.mass))+
+  geom_boxplot()+
+  facet_wrap(~trophic.guild) +
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
 ```
 
 2. Use facet_grid to compare the distribution of `log10.mass` by `locomotion`.

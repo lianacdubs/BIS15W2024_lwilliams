@@ -209,7 +209,6 @@ homerange %>%
             max= max(log10.mass))
 ```
 
-
 ```{r}
 summary(homerange$log10.mass) #another way to get min and max
 ```
