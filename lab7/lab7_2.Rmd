@@ -67,7 +67,6 @@ penguins %>%
   summarize(mean_body_mass=mean(body_mass_g),
             n=n()) #n=n() gives you total count
 #pull out all the observations that have a number and leave all the NAs behind. 
-  
 ```
 
 What if we are interested in the number of observations (penguins) by species and island?

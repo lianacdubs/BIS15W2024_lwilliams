@@ -63,7 +63,7 @@ penguins %>%
 1. Produce a summary of the mean for bill_length_mm, bill_depth_mm, flipper_length_mm, and body_mass_g within Adelie penguins only. Be sure to provide the number of samples.
 ```{r}
 penguins %>% 
-  filter(species=="Adelie") %>% 
+  filter(species=="Adelie") %>% #references the column name Adelie 
   select(bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g) %>% 
   summarize(mean_bill_length_mm=mean(bill_length_mm, na.rm=T),
             mean_bill_depth_mm=mean(bill_depth_mm, na.rm=T),
@@ -106,7 +106,7 @@ penguins %>%
 By using `across()` we can reduce the clutter and make things cleaner. 
 ```{r}
 penguins %>%
-  summarize(across(c(species, island, sex), n_distinct))
+  summarize(across(c(species, island, sex), n_distinct)) #concatenate the variables of interest, get counts
 ```
 
 This is very helpful for continuous variables.
@@ -131,7 +131,7 @@ penguins %>%
 Operators can also work, here I am summarizing `n_distinct()` across all variables except `species`, `island`, and `sex`.
 ```{r}
 penguins %>%
-  summarize(across(!c(species, island, sex, year), #summarize across all the variables that are not
+  summarize(across(!c(species, island, sex, year), #summarize across all the variables that are not these
                    mean, na.rm=T))
 ```
 

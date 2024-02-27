@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 #Review when to use each plot type
 
-#Hw 8 to... (double check with profs answers )
+#Hw 8 to... (double check with profs answers hw 10 & 11)
 
 ## HW 8
 
@@ -267,9 +267,468 @@ univ_calif_final %>%
 
 **Insert solns here**
 
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(naniar)
+``` 
+
+## Desert Ecology
+For this assignment, we are going to use a modified data set on [desert ecology](http://esapubs.org/archive/ecol/E090/118/). The data are from: S. K. Morgan Ernest, Thomas J. Valone, and James H. Brown. 2009. Long-term monitoring and experimental manipulation of a Chihuahuan Desert ecosystem near Portal, Arizona, USA. Ecology 90:1708.
+```{r}
+deserts <- read_csv("data/surveys_complete.csv") %>% clean_names()
+```
+
+1. Use the function(s) of your choice to get an idea of its structure, including how NA's are treated. Are the data tidy?  
+```{r}
+glimpse(deserts) #structure of the data
+```
+
+```{r}
+miss_var_summary(deserts) #The NA's are represented by NA
+```
+
+```{r}
+summary(deserts)
+```
+
+```{r}
+deserts
+#the data is tidy! 
+# each variable has its own column  
+# each observation has its own row  
+# each value has its own cell  
+```
+
+
+
+2. How many genera and species are represented in the data? What are the total number of observations? Which species is most/ least frequently sampled in the study?
+```{r}
+deserts %>% 
+  summarize(n_genera = n_distinct(genus), #amount of genera in the dataset
+            n_species = n_distinct(species), #amount of distinct species in dataset
+            n_total_observations = n()) #total amount of observations
+```
+In the dataset: 26 genera, 40 species, 34,786 observations. 
+```{r}
+deserts %>% 
+  count(species) %>% #amount of observations for each species
+  arrange(n)
+```
+^Species that is the least frequently sampled have one observation. (clarki, scutalatus, tereticaudus, tigris, uniparens, viridis)
+
+```{r}
+deserts %>% 
+  count(species) %>%
+  arrange(desc(n)) #sort most to least observations
+```
+^Species that is the most frequently sampled merriami with 10,596!
+
+3. What is the proportion of taxa included in this study? Show a table and plot that reflects this count.
+
+```{r}
+deserts %>% 
+  count(taxa) %>% 
+  arrange(desc(n))
+```
+
+```{r}
+#another way to solve
+#taxa_prop <- deserts %>% 
+  #tabyl(taxa)
+#taxa_prop
+```
+
+```{r}
+deserts %>% 
+  ggplot(aes(x = taxa, fill = taxa)) +
+  geom_bar() + 
+  scale_y_log10() + 
+  labs(title = "Taxa Represented in Study",
+       x = "Taxonomic Group",
+       y = "Individuals") + 
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.75)) #move and resize labels
+```
+Rodents are studied the most among the taxa data we have available to us. 
+
+4. For the taxa included in the study, use the fill option to show the proportion of individuals sampled by `plot_type.`
+```{r}
+deserts %>% 
+  ggplot(aes(x = taxa, fill = plot_type))+ #this is the modified line to show the prop. of indiv. sampled by 'plot_type'
+  geom_bar()+
+  scale_y_log10()+ #fixes viewing for continuous data
+  labs(title = "Taxa Represented in Study", 
+       x = "Taxa", 
+       y = "Number of Observations",
+       fill = "Type of Plot") +
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.75))
+```
+
+5. What is the range of weight for each species included in the study? Remove any observations of weight that are NA so they do not show up in the plot.
+**I Found two ways to do this**
+```{r}
+deserts %>% 
+  filter(!weight=="NA") %>% 
+  ggplot(aes(x=weight, fill=species))+
+  geom_boxplot(na.rm = T, position="dodge")+
+  scale_y_log10()+
+  labs(title = "Weight by Species",
+       x= "Weight",
+       y= "Species")+
+  theme(plot.title=element_text(size=rel(1.5),hjust=0.5))
+```
+
+```{r}
+deserts %>% 
+  filter(weight != "NA") %>% 
+  unite(species_name, "genus", "species", sep = " ") %>% 
+  ggplot(aes(x = species_name, y = weight))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Weight by Species",
+       x = "Weight",
+       y = "Species Name")+
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5))
+```
+
+6. Add another layer to your answer from #5 using `geom_point` to get an idea of how many measurements were taken for each species.
+**I found two ways to do this**
+```{r}
+deserts %>% 
+  filter(!weight=="NA") %>% 
+  ggplot(aes(x=weight,y=species))+
+  geom_point(na.rm = T)+ #geom_point is used here instead!
+  labs(title = "Weight by Species",
+       x= "Weight",
+       y= "Species")+
+  theme(plot.title=element_text(size=rel(1.5),hjust=0.5))
+```
+
+```{r}
+deserts %>% 
+  filter(weight != "NA") %>% 
+  unite(species_name, "genus", "species", sep = " ") %>% 
+  ggplot(aes(x = species_name, y = weight))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Weight by Species",
+       x = "Weight",
+       y = "Species Name")+
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5))+
+  geom_point(aes(color = weight), size = 0.5) #Modified line of code that adds a scatter plot
+```
+
+
+7. [Dipodomys merriami](https://en.wikipedia.org/wiki/Merriam's_kangaroo_rat) is the most frequently sampled animal in the study. How have the number of observations of this species changed over the years included in the study?
+```{r}
+names(deserts)
+```
+```{r}
+deserts %>% 
+  count(year) %>% #creating counts of observations by year
+  ggplot(aes(x = year, y = n)) + #creating the plot
+  geom_point() + #creating the scatterplot
+  labs(title = "Number of Observations by Year",
+       x = "Year",
+       y = "Number of Observations") + #adding labels
+  theme(plot.title = element_text(size = rel(1.3), hjust = 0.5)) + #resizing and moving labels
+  geom_smooth(method = lm, se = T) #adding line of best fit
+```
+
+**I solved another way**
+As a bar plot it is difficult to tell how the number of species changed over time. It seems in this example that the amount of species fluctuated over time.
+```{r}
+deserts %>% 
+  filter(species_id=="DM") %>% 
+  group_by(year) %>% 
+  summarise(n_samples=n()) %>% 
+  ggplot(aes(x=as.factor(year),y=n_samples))+
+    geom_col()+
+  theme(axis.text.x = element_text(angle=45, hjust=1))+
+  labs(title = "DM Observations per Year",
+       x="Number of Observations",
+       y= "Year")
+```
+
+As time has gone on, the number of observations seems to have a positive correlation which could mean the more species were observed over time due to biological factors like predators typically preferring larger prey or the ability for Merriam's Kangaroos to produce up to three litters per year. 
+
+8. What is the relationship between `weight` and `hindfoot` length? Consider whether or not over plotting is an issue.
+```{r}
+deserts %>% 
+  ggplot(aes(x = weight, y = hindfoot_length)) + 
+  geom_jitter() + #reducing overplotting
+  labs(title = "Hindfoot Length vs Weight",
+       x = "Weight",
+       y = "Hindfoot Length") + #adding labels
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5)) + 
+  geom_smooth(method = lm, se = T)
+```
+There is a positive correlation between weight and hindfoot length.Hindfoot length will increase with weight. Overplotting is an issue. 
+
+**This is another method**
+```{r}
+deserts %>% 
+  ggplot(aes(x=weight,y=hindfoot_length))+
+  geom_point(na.rm=T,size=1.2)+
+  geom_smooth(method=lm,se=F)+
+  scale_y_log10()+
+   theme(axis.text.x = element_text(angle=45, hjust=1))+
+  labs(title = "Hindfoot Length vs. Weight",
+       x="Weight",
+       y= "Hindfoot Length")
+```
+
+
+9. Which two species have, on average, the highest weight? Once you have identified them, make a new column that is a ratio of `weight` to `hindfoot_length`. Make a plot that shows the range of this new ratio and fill by sex.
+```{r}
+deserts %>% 
+  group_by(species) %>% 
+  filter(!weight=="NA") %>% 
+  summarize(avg_weight = mean(weight, na.rm = T)) %>% 
+  arrange(desc(avg_weight)) %>% 
+  head(2, species) #displays the two species with highest average weight
+```
+The two species are albigula and spectabilis with the highest mean weight!
+
+**Plot**
+```{r}
+#New column with ratio of 'weight' to 'hind_foot' 
+high_weight_desert <- deserts %>% 
+  filter(species == "albigula" | species == "spectabilis") %>% 
+  mutate(w_hindfoot_length_ratio = weight / hindfoot_length)
+high_weight_desert 
+```
+
+
+```{r}
+high_weight_desert %>% 
+  filter(sex != "NA") %>% 
+  ggplot(aes(x = species, y = w_hindfoot_length_ratio, fill = sex))+
+  geom_boxplot(alpha = 0.5) #use boxplot because we are finding a range of variables
+```
+Another way to do the **Plot**
+
+```{r}
+#deserts %>% 
+  #filter(species_id=="DS" | species_id =="NL") %>% 
+ # filter(!weight=="NA" & !hindfoot_length=="NA" & !sex=="NA") %>% #we use 'and' for the data with NA values for our variables of interest. 
+ # mutate(ratio=weight/hindfoot_length) %>%
+ # select(ratio,species_id,weight,sex) %>% 
+ # ggplot(aes(x=ratio,fill=sex))+
+  #geom_boxplot()+
+  #theme(axis.text.x = element_text(angle=45, hjust=1))+
+  #labs(title = "Weight to Foot Ratios",
+       #x="Ratio")
+```
+
+10. Make one plot of your choice! Make sure to include at least two of the aesthetics options you have learned.
+
+```{r}
+deserts %>% 
+  filter(genus == "Sigmodon" & species== "hispidus") %>% 
+  filter(sex!="NA") %>% 
+  ggplot(aes(year, fill=sex))+
+  geom_bar(position = "dodge")+
+  scale_y_log10()+ #for ease of viewing
+    labs(title = "Sigmodon hispidus vs. Time",
+       x = "Year",
+       y = "Count")
+```
+This code shows how the number of observations of Sigmodon hispidus has changed over time. I grouped and filled by sex. 
+
 ##HW 11 
 
 **Insert solns here**
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(here)
+library(naniar)
+``` 
+
+```{r}
+options(scipen = 999)
+```
+
+## Resources
+The idea for this assignment came from [Rebecca Barter's](http://www.rebeccabarter.com/blog/2017-11-17-ggplot2_tutorial/) ggplot tutorial so if you get stuck this is a good place to have a look.  
+
+## Gapminder
+For this assignment, we are going to use the dataset [gapminder](https://cran.r-project.org/web/packages/gapminder/index.html). Gapminder includes information about economics, population, and life expectancy from countries all over the world. You will need to install it before use. This is the same data that we will use for midterm 2 so this is good practice.
+```{r}
+#install.packages("gapminder")
+library("gapminder")
+```
+
+## Questions
+The questions below are open-ended and have many possible solutions. Your approach should, where appropriate, include numerical summaries and visuals. Be creative; assume you are building an analysis that you would ultimately present to an audience of stakeholders. Feel free to try out different `geoms` if they more clearly present your results.  
+
+**1. Use the function(s) of your choice to get an idea of the overall structure of the data frame, including its dimensions, column names, variable classes, etc. As part of this, determine how NAs are treated in the data.**
+```{r}
+gapminder <- gapminder %>% clean_names() #be able to view gapminder
+```
+
+```{r}
+glimpse(gapminder) #overall structure
+```
+```{r}
+dim(gapminder) #dimensions 6var.; 1704 obs.
+```
+```{r}
+names(gapminder) #names of columns
+```
+#check for NAs 
+```{r}
+miss_var_summary(gapminder)
+```
+
+```{r}
+summary(gapminder)
+```
+
+**2. Among the interesting variables in gapminder is life expectancy. How has global life expectancy changed between 1952 and 2007?**
+```{r}
+gapminder %>%
+  mutate(year = as.factor(year)) %>% 
+  group_by(year) %>% 
+  ggplot(aes(x = year, y = life_exp)) +
+  geom_boxplot(fill = "green4", alpha = 0.6) +
+  labs(title = "Life Expectancy vs. Time",
+       x = NULL,
+       y = "Age") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+It seems to have increased over the years! 
+
+**3. How do the distributions of life expectancy compare for the years 1952 and 2007?**
+```{r}
+gapminder %>% 
+  filter(year == 1952 | year == 2007) %>% 
+  mutate(year = as.factor(year)) %>% #year changed to fct from int
+  group_by(year) %>% 
+  ggplot(aes(x = year, y = life_exp))+
+  geom_boxplot(fill="navy", alpha = 0.3)+
+  labs(title = "Life Expectancy Comparing 1952 to 2007", 
+       x = NULL, 
+       y = "Age")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+People live longer now than they did in the past!
+
+**4. Your answer above doesn't tell the whole story since life expectancy varies by region. Make a summary that shows the min, mean, and max life expectancy by continent for all years represented in the data.**
+```{r}
+gapminder %>% 
+  group_by(continent, year) %>% 
+  summarize(min = min(life_exp),
+            mean = mean(life_exp), 
+            max = max(life_exp))
+```
+
+**5. How has life expectancy changed between 1952-2007 for each continent?**
+```{r}
+gapminder %>% 
+  mutate(year = as.factor(year)) %>% 
+  ggplot(aes(x = year, y  = life_exp))+
+  geom_boxplot(fill = "steelblue2")+
+  facet_wrap(~continent)+
+  labs(title = "Life Expectancy from 1952 to 2007 in Each Continent",
+       x = NULL, 
+       y = "Age")+
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_text(angle = 60, hjust = 1))+ 
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+The all the continents seem to follow the same trend that life expectancy is increasing as time gets later and later. 
+
+**6. We are interested in the relationship between per capita GDP and life expectancy; i.e. does having more money help you live longer?**
+```{r}
+gapminder %>% 
+  ggplot(aes(x = gdp_percap, y = life_exp, color=continent))+
+  geom_point()+
+  geom_smooth(method = lm, color = "darkgrey")+
+  scale_x_log10()+
+  labs(title = "GDP per Capita vs Life Expectancy", 
+       x = "GDP per Capita", 
+       y = "Life Expectancy")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+There is a positive correlation meaning that having more money could allow you to live longer (maybe you have better access to medical coverage).  
+
+**7. Which countries have had the largest population growth since 1952?**
+```{r}
+gapminder %>% 
+  group_by(country) %>% 
+  summarise(min = min(pop), 
+            max = max(pop), 
+            change = max - min) %>% 
+  arrange(desc(change))
+```
+^The countries are listed here! China has one of the largest changes. 
+
+```{r}
+#This is another way to approach the problem! 
+gapminder %>% 
+  filter(year == "1952" | year == "2007") %>% 
+  select(country, continent, year, pop) %>% 
+  pivot_wider(names_from = year,
+              values_from = pop) %>% 
+  clean_names() %>% 
+  mutate(pop_change = x2007 - x1952) %>% 
+  arrange(desc(pop_change)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = country, y = pop_change, fill = country)) + #creating the plot
+  geom_col() + #creating a boxplot
+  coord_flip() +
+  scale_fill_brewer(palette = "BuPu") + #choosing the color scheme
+  labs(title = "Population Growth for Countries between 1952 and 2007",
+       x = "Country",
+       y = "Population Change",
+       fill = "Country") + #adding labels
+  theme(plot.title = element_text(size = rel(1.3), hjust = 0.8))+
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+
+**8. Use your results from the question above to plot population growth for the top five countries since 1952.**
+```{r}
+gapminder %>%
+  filter(country == "China" | country == "India" | country == "United States" | country == "Indonesia" | country == "Brazil") %>%
+  ggplot(aes(x = year, y = pop)) +
+  geom_line(aes(color = country)) +
+  labs(title = "Population Growth",
+       y = "Population",
+       x = NULL) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+**9. How does per capita GDP growth compare between these same five countries?**
+```{r}
+gapminder %>%
+  filter(country == "China" | country == "India" | country == "United States" | country == "Indonesia" | country == "Brazil") %>%
+  ggplot(aes(x = year)) +
+  geom_line(aes(y = gdp_percap, color = country)) +
+  labs(title = "GDP Per Capita Over Time",
+       y = "GDP Per Capita",
+       x = NULL) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+**10. Make one plot of your choice that uses faceting!**
+```{r}
+gapminder %>% 
+  ggplot(aes(x = continent, y = pop))+
+  geom_boxplot()+
+  facet_wrap(~year)+
+  labs(title = "Population of Continents Over Time", 
+       y = "Population", 
+       x = NULL)+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+#facet_wrap makes a ribbon of panels by a specified categorical variable. This shows all the continenets through the years and compares their population. 
+```
 
 #Lab 8 to 12
 

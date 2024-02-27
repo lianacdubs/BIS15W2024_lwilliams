@@ -98,7 +98,7 @@ homerange <- read_csv("data/Tamburelloetal_HomeRangeDatabase.csv")
 
 Boxplots help us visualize a range of values. So, on the x-axis we typically have something categorical and the y-axis is the range. In the case below, we are plotting `log10.mass` by taxonomic class in the `homerange` data. `geom_boxplot()` is the geom type for a standard box plot. The center line in each box represents the median, not the mean.
 
-Let's look at the variable `log10.mass` grouped by taxonomic class.
+Let's look at the variable `log10.mass` grouped by class.
 ```{r}
 homerange %>% 
   group_by(class) %>% #take all the class and put them together 
@@ -145,6 +145,14 @@ homerange %>%
 
 2. Have a closer look at carnivorous mammals. Summarize the range of log10.mass by family.
 
+```{r}
+homerange %>% 
+  filter(trophic.guild=="carnivore" & class=="mammalia") %>% 
+  select(family, trophic.guild, log10.mass) %>% 
+  ggplot(aes(x=family, y=log10.mass))+
+  geom_boxplot()+
+  coord_flip()
+```
 
 
 3. Now use a boxplot to visualize the range of log10.mass by family of mammalian carnivore.

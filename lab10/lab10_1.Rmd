@@ -110,6 +110,9 @@ homerange <- read_csv("data/Tamburelloetal_HomeRangeDatabase.csv")
 ```{r}
 glimpse(homerange)
 ```
+```{r}
+homerange
+```
 
 
 ### 1. Scatter Plots
@@ -150,8 +153,8 @@ names(homerange)
 ```{r}
 ggplot(data=homerange, #specify the data
        mapping=aes(x=log10.hra, y=log10.preymass))+ #map the aesthetics
-  geom_point(na.rm = T) #add the plot type
-###geom_smooth(method = lm, se=T, na.rm = T) ####FIX THIS CODE 
+  geom_point(na.rm = T)+ #add the plot type
+  geom_smooth(method=lm, se=T) 
 ```
 #There is a warning if leave geom_point() empty ^. if you don't put na.rm=t; by default ggplot will pull these out. 
 

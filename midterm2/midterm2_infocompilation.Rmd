@@ -13,10 +13,24 @@ knitr::opts_chunk$set(echo = TRUE)
 Note: the objects sent to a function are called its arguments(aka parameters)
 + Review functions ()
 
-mutate() creates new colums that are functions of existing variables; it can also modify and delete columns 
 arrange() orders the rows of a data frame by the values of selected columns
+
+mutate() creates new colums that are functions of existing variables; it can also modify and delete columns 
 select() choose which columns of the dataframe you would like to work with
-filter()  effectively does a mutate() to generate a logical variable, and then only keeps the rows where the variable is TRUE. This means that grouped filters can be used with summary functions. 
+filter()    ex: filter(order=="Primates") effectively does a mutate() to generate a logical variable, and then only keeps the rows where the variable is TRUE. This means that grouped filters can be used with summary functions. 
+```{r}
+#Start by building a new data frame `msleep24` from the `msleep` data that: contains the `name` and `vore` variables along with a new column called `sleep_total_24` which is the amount of time a species sleeps expressed as a proportion of a 24-hour day. Restrict the `sleep_total_24` values to less than or equal to 0.3. Arrange the output in descending order.  
+msleep24 <- msleep %>% 
+  mutate(sleep_total_24 = sleep_total/24) %>% 
+  select(name, vore, sleep_total_24) %>% 
+  filter(sleep_total_24<=0.3) %>% 
+  arrange(desc(sleep_total_24))
+
+#check by looking at the max and min values do summary(msleep24)
+```
+
+skim() part of skimr package that is a toolt to check what the output is. 
+
 across() involved with multiple variables 
 ```{r}
 penguins %>%
@@ -27,22 +41,32 @@ penguins %>%
 group_by() takes a dataframe and one or more variables to group by.
 ```{r}
 penguins %>% 
-  group_by(island) %>% 
+  group_by(island) %>% #group by the categorical variable island
   summarize(n=n())
 ```
-summarize() creates a new data frame. It returns one row for each combination of grouping variables, if there are no grouping variables, output will have a single row summarising all observations in the input. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified. 
+summarize() will produce summary statistics for a given variable in a new data frame. It returns one row for each combination of grouping variables, if there are no grouping variables, output will have a single row summarising all observations in the input. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified. 
 ```{r}
 #if you are asked to calculate the mean of `sleep_total` for large
 msleep %>% 
-  filter(bodywt>200) %>% 
+  filter(bodywt>200) %>% #gives us the body weigh greater than 200
   summarize(mean_sleep_lg=mean(sleep_total))
+```
+
+Combine functions to make useful summaries for multiple variables
+```{r}
+msleep %>% 
+  filter(bodywt>200) %>% 
+  summarize(mean_sleep_lg=mean(sleep_total), min_sleep_lg=min(sleep_total), max_sleep_lg=max(sleep_total), sd_sleep_lg=sd(sleep_total), total=n())
+#This is needed for the Midterm 
+#total tells you the number of observations (rows)
 ```
 `count()` is an easy way of determining how many observations you have within a column. It acts like a combination of `group_by()` and `n()`.
 ```{r}
 penguins %>% 
   count(island, sort = T) #sort=T sorts the column in descending order #can add more variables 
+#you can add mor variables after island by adding a comma
 ```
-For counts tabyl() also works 
+For counts tabyl() also works (this is part of the janitor package and also shows counts)
 ```{r}
 penguins %>% 
   tabyl(island, species)
@@ -50,8 +74,7 @@ penguins %>%
 `n_distinct()` is a very handy way of cleanly presenting the number of distinct observations. 
 ```{r}
 msleep %>% 
-  filter(bodywt > 100) %>% 
-  summarize(n_genera=n_distinct(genus))
+  summarize(n_genera=n_distinct(genus)) #this is going to count the number of genera in msleep
 ```
 
 
@@ -120,10 +143,56 @@ penguins %>%
   summarize(across(contains("mm"), mean, na.rm=T))
 ```
 
-**group_by also works**
+Here we summarize across all variables.
 ```{r}
 penguins %>%
-  group_by(sex) %>% 
+  summarise_all(mean, na.rm=T)
+```
+
+Operators can also work, here I am summarizing across all variables except `species`, `island`, `sex`, and `year`.
+```{r}
+penguins %>%
+  summarise(across(!c(species, island, sex, year), 
+                   mean, na.rm=T))
+```
+
+All variables that include "bill"...all of the other dplyr operators also work.
+```{r}
+penguins %>%
+  summarise(across(starts_with("bill"), mean, na.rm=T))
+```
+
+##How are NAs being treated?
+```{r}
+msleep %>% 
+  group_by(order) %>% 
+  summarize(mean_brain_wt=mean(brainwt, na.rm=T))
+```
+```{r}
+penguins %>% 
+  group_by(island) %>% 
+  summarize(number_NAs=sum(is.na(body_mass_g))) #The NAs that exist are messing up the data 
+```
+##Remove NAs 
+```{r}
+penguins %>% 
+  group_by(island) %>%  
+  filter(!is.na(body_mass_g)) %>% 
+  summarize(mean_body_mass=mean(body_mass_g),
+            n=n()) #n=n() gives you total count
+#pull out all the observations that have a number and leave all the NAs behind. 
+```
+**summary of NA's in each variable**
+Here is a new one for you using the `purrr` package. This will give you a quick summary of the number of NA's in each variable.
+```{r}
+life_history %>% 
+  map_df(~ sum(is.na(.))) #tell where all the NAs ; R doesn't see -999 as NAs 
+```
+
+**group_by also works** use it for categorical data
+```{r}
+penguins %>%
+  group_by(sex) %>% #you can add a comma to add another variable 
   summarize(across(contains("mm"), mean, na.rm=T))
 ```
 
@@ -186,7 +255,7 @@ naniar::miss_var_summary(life_history)
 ```{r}
 life_history <- 
   life_history %>% 
-  mutate(max_life=na_if(max_life, 0))
+  mutate(max_life=na_if(max_life, 0)) #max life should not be 0 thats why we are replacing it
 ```
 
 **We can also use `miss_var_summary` with `group_by()`. This helps us better evaluate where NA's are in the data.**
@@ -227,11 +296,16 @@ cites %>%
 
 ### Visualizing NAs
 ```{r}
-vis_dat(life_history) #classes of data
+vis_dat(life_history) #classes of data (which variables have large amounts of missing data; this provides visual snapshot)
 ```
 
 ```{r}
-vis_miss(life_history)
+vis_miss(life_history)  #this is done for certain variables; this shows just the missing parts. 
+```
+
+**common NA's** Finally, naniar has some built-in examples of common values or character strings used to represent NA's. The chunk below will use these built-in parameters to replace NA's across the entire data set.
+```{r}
+common_na_strings
 ```
 
 ### Dealing with NA's in advance
@@ -244,8 +318,16 @@ life_history_advance <-
 
 
 ## LAB 9
-### pivot_longer  
+### pivot_longer  (wide to long)
 **Scientists frequently use spreadsheets that are organized to make data entry efficient. This is often referred to as wide format. Unfortunately, the wide format creates a problem because column names may actually represent values of a variable. The command `pivot_longer()` shifts data from wide to long format.**   
+
+##Pivot data from wide to long.  
+pivot_longer() "lengthens" data, increasing the number of rows and decreasing the number of columns.
+```{r}
+#pivot_longer() makes datasets LONGER by increasing
+#^This command shifts data from wide to long
+#The problem is that column names may represent values of a variable! 
+```
 
 **Rules:** 
 + `pivot_longer`(cols, names_to, values_to)
@@ -291,7 +373,7 @@ Some (but not all) of the column names are data. We also have NA's.
 billboard <- read_csv("data/billboard.csv")
 ```
 
-Solution 1: specify a range of columns that you want to pivot.
+Solution 1: specify a range of columns that you want to pivot. (**when you need to pivot some but not all data**)
 ```{r}
 billboard2 <- 
   billboard %>% 
@@ -338,6 +420,24 @@ plant_data %>%
                values_drop_na = TRUE)
 ```
 
+## Example 3: more than one variable in a column name
+In this case, there are two observations in each column name.
+```{r}
+qpcr_untidy <- read_csv("data/qpcr_untidy.csv")
+qpcr_untidy
+```
+#now we have two things in the column name exp1rep1 and exp1rep2
+`names_sep` helps pull these apart, but we still have "exp" and "rep" to deal with.  
+```{r}
+qpcr_untidy %>% 
+  pivot_longer(
+    exp1_rep1:exp3_rep3,
+    names_to= c("experiment", "replicate"), #two new variables 
+    names_sep="_", #because exp_rep
+    values_to="mRNA_expression" #new variable
+  )
+```
+
 Recall that we use `pivot_longer()` when our column names actually represent variables. A classic example would be that the column names represent observations of a variable.
 ```{r}
 datasets::USPersonalExpenditure
@@ -366,7 +466,7 @@ expenditures %>%
                names_to = "year",
                values_to = "bn_dollars") %>% 
   filter(expenditure=="Medical and Health") %>% 
-  arrange(-bn_dollars)
+  arrange(-bn_dollars) #the negative sign is the same as desc
 ```
 
 ```{r}
@@ -421,10 +521,16 @@ heartrate3
 ```{r}
 heartrate3 %>% 
   unite(patient_sex, "patient", "sex", sep=" ") #does the opposite, takes two variables and combines
+#patient_sex is the new column
 ```
 
 ### pivot_wider
 The opposite of `pivot_longer()`. You use `pivot_wider()` when you have an observation scattered across multiple rows. In the example below, `cases` and `population` represent variable names not observations.  
+##pivot data from long to wide 
+pivot_wider() "widens" data, increasing the number of columns and decreasing the number of rows.
+```{r}
+#column namess are the problem. there is (more than one) value per cell and the columns represent values.
+```
 
 Rules:  
 + `pivot_wider`(names_from, values_from)  
@@ -441,11 +547,12 @@ tb_data %>%
   pivot_wider(names_from = "key", #the observations under key will become new columns
               values_from = "value") #the values under value will be moved to the new columns
 ```
-
+The value comlumn is not represented as a single variable (cases and population)
 **Examples**
 Load the `gene_exp.csv` data as a new object `gene_exp`. Are these data tidy? Use `pivot_wider()` to tidy the data.
 ```{r}
 gene_exp <- read_csv("data/gene_exp.csv")
+#there are more than one variable in a column (treatment and control)
 ```
 
 ```{r}
@@ -489,10 +596,16 @@ We first need to define some of the data types we will use to build plots.
 + `continuous` quantitative data that can take any numerical value
 + `categorical` qualitative data that can take on a limited number of values
 
+**Continuous Variables = numerical variables that can assume any value within a specified range. They can take on an infinite number of values between two endpoints. The values they assume do not have fixed intervals and can be represented with any degree of precision via fractions or decimal points.**
+e.g. height 
+
+**A categorical variable(qualitative variable) is a variable with a set number of groups (gender, colors of the rainbow, brands of cereal), while a numeric variable is generally something that can be measured (height, weight, miles per hour)**
+
 ### Basics
 The syntax used by ggplot takes some practice to get used to, especially for customizing plots, but the basic elements are the same. It is helpful to think of plots as being built up in layers.  
 
 In short, **plot= data + geom_ + aesthetics**.  
+#geom is how we want our data represented 
 
 We start by calling the ggplot function, identifying the data, and specifying the axes. We then add the `geom` type to describe how we want our data represented. Each `geom_` works with specific types of data and R is capable of building plots of single variables, multiple variables, and even maps. Lastly, we add aesthetics.
 
@@ -507,6 +620,7 @@ glimpse(iris)
 ```
 
 To make a plot, we need to first specify the data and map the aesthetics. The aesthetics include how each variable in our data set will be used. In the example below, I am using the aes() function to identify the x and y variables in the plot.
+### The `mapping=` function is implied by `aes` and so is often left out. 
 ```{r}
 ggplot(data=iris, #specify the data
        mapping=aes(x=Species, y=Petal.Length)) #map the aesthetics
@@ -541,6 +655,7 @@ Scatter plots are good at revealing relationships that are not readily visible i
 #When you have paired numerical data.
 #When your dependent variable may have multiple values for each value of your independent variable.
 #When trying to determine whether the two variables are related, such as: When trying to identify potential root causes of problems.
+#two continuous variables
 
 In the case below, we are exploring whether or not there is a relationship between animal mass and home range. We are using the **log transformed values** because there is a large difference in mass and home range among the different species in the data.
 
@@ -564,7 +679,7 @@ ggplot(data=homerange, #specify the data
   geom_point() #add the plot type
 ```
 
-In big data sets with lots of overlapping values, over-plotting can be an issue. `geom_jitter()` is similar to `geom_point()` but it helps with over plotting by adding some random noise to the data and separating some of the individual points.
+In big data sets with lots of overlapping values, over-plotting can be an issue. `geom_jitter()` is similar to `geom_point()` but it helps with **over plotting** by adding some random noise to the data and separating some of the individual points.
 ```{r}
 ggplot(data=homerange, mapping=aes(x=log10.mass, y=log10.hra))+
   geom_jitter() #if you have really big data set (over plotting) => adds some random noise
@@ -576,6 +691,7 @@ ggplot(data=homerange, mapping=aes(x=log10.mass, y=log10.hra))+
   geom_point()+
   geom_smooth(method=lm, se=T) #add a regression line
 ```
+#There is a warning if leave geom_point() empty ^. if you don't put na.rm=t; by default ggplot will pull these out. 
 
 ```{r}
 life_history %>% 
@@ -602,6 +718,7 @@ ggplot(data=homerange,
 
 ### Bar Plot: geom_bar **A barplot is used to display the relationship between a numeric and a categorical variable.**
 The simplest type of bar plot counts the number of observations in a categorical variable. In this case, we want to know how many observations are present in the variable `trophic.guild`. Notice that we do not specify a y-axis because it is count by default.  
+####this is good for straight counts
 
 ```{r}
 names(homerange)
@@ -616,7 +733,7 @@ Also notice that we can use pipes! The `mapping=` function is implied by `aes` a
 ```{r}
 homerange %>% 
   ggplot(aes(trophic.guild)) +  #don't need to use x since we are counting one variable
-  geom_bar() #good for counts and categorical data not continuous 
+  geom_bar() #good for counts and categorical data not continuous! 
 ```
 
 ```{r message=FALSE, warning=FALSE}
@@ -640,6 +757,7 @@ homerange %>%
   geom_col()
 ```
 
+#Map a variable to y-axis
 `geom_bar()` with `stat="identity"`
 `stat="identity"` allows us to map a variable to the y-axis so that we aren't restricted to counts.
 ```{r}
@@ -766,7 +884,7 @@ penguins %>%
 How about average bill length by sex?
 ```{r}
 penguins %>% 
-  filter(sex!="NA") %>% 
+  filter(sex!="NA") %>% #takes out all the NAs in sex
   group_by(sex) %>% 
   summarise(avg_bill_lenth_mm=mean(bill_length_mm)) %>% 
   ggplot(aes(x=sex, y=avg_bill_lenth_mm))+
@@ -774,7 +892,7 @@ penguins %>%
 ```
 
 ### Box Plots
-For the next series of examples, we will use the `homerange` data.  
+For the next series of examples, we will use the `homerange` data.  The center line in each box represents the median, not the mean.
 
 ##When to use boxplot?
 **when comparing between several data sets**
@@ -803,6 +921,14 @@ homerange %>%
 
 **Examples**
 There are more herbivores than carnivores in the homerange data, but how do their masses compare? Make a summary and boxplot that compares their masses. Use `log10.mass`.
+```{r}
+homerange %>% 
+  group_by(trophic.guild) %>% 
+  summarize(mean_log10_mass=mean(log10.mass)) %>% 
+  ggplot(aes(x=trophic.guild, y=mean_log10_mass))+
+  geom_col() #bar plot 
+```
+
 ```{r}
 homerange %>% 
   select(trophic.guild, log10.mass) %>% 
@@ -1080,7 +1206,17 @@ homerange %>%
 ```
 
 
-## LAB 12
+## LAB 12  
+
+**Color vs. Fill**
+```{r}
+homerange %>% 
+  ggplot(aes(x = log10.mass)) +
+  geom_histogram(color = "seagreen", fill = "steelblue1", bins=10)+
+  labs(title = "Distribution of Body Mass")
+#Color is the outline and fill is the color 
+```
+#fill does not work in scatterplots
 
 ```{r message=FALSE, warning=FALSE}
 deserts <- read_csv("data/surveys_complete.csv")
@@ -1382,6 +1518,10 @@ The thing to notice is that there are three different color palettes: 1) sequent
 display.brewer.pal(9,"BuPu") #sequential palette
 ```
 
+```{r}
+display.brewer.pal(12,"BuPu") #sequential palette ; the number corresponds to the amount of shades
+```
+**On the website 5-class and it gives you the palette name and you can put it in**
 The [R Color Brewer](http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3) website is very helpful for getting an idea of the color palettes. To make things easy, use these two guidelines:
 
 +`scale_colour_brewer()` is for points  

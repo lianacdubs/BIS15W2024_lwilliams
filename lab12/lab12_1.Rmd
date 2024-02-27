@@ -91,7 +91,6 @@ homerange %>%
   ggplot(data=homerange, 
          mapping=aes(x = class, y=log10.mass, fill=taxon))+ #fill by taxon is a different categorical variable
   geom_boxplot()
-
 ```
 
 ## Line plots **potential problem for midterm2**
@@ -104,7 +103,7 @@ deserts %>%
   mutate(year=as.factor(year)) %>%  #shortcut: change the year variable to a factor; because year as a numeric is complicated because they represent individual sampling points and not continuous numeric
   group_by(year, species_id) %>% 
   summarize(n=n(), .groups = 'keep') %>% 
-  pivot_wider(names_from = species_id, values_from = n) #makes data nicer
+  pivot_wider(names_from = species_id, values_from = n) #makes data nicer since species id has either DM or DS
 #we are interested in how sampling has changed over time.
 ```
 
