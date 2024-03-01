@@ -1,0 +1,1580 @@
+---
+title: "sg2_midterm"
+author: "Liana Williams"
+date: "2024-02-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Review when to use each plot type
+
+#Hw 8 to... (double check with profs answers hw 10 & 11)
+
+## HW 8
+
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+``` 
+
+## Install `here`
+The package `here` is a nice option for keeping directories clear when loading files. I will demonstrate below and let you decide if it is something you want to use.  
+```{r}
+#install.packages("here")
+```
+
+## Data
+For this homework, we will use a data set compiled by the Office of Environment and Heritage in New South Whales, Australia. It contains the enterococci counts in water samples obtained from Sydney beaches as part of the Beachwatch Water Quality Program. Enterococci are bacteria common in the intestines of mammals; they are rarely present in clean water. So, enterococci values are a measurement of pollution. `cfu` stands for colony forming units and measures the number of viable bacteria in a sample [cfu](https://en.wikipedia.org/wiki/Colony-forming_unit).   
+
+This homework loosely follows the tutorial of [R Ladies Sydney](https://rladiessydney.org/). If you get stuck, check it out!  
+
+1. Start by loading the data `sydneybeaches`. Do some exploratory analysis to get an idea of the data structure.
+```{r}
+sydneybeaches <- read_csv("data/sydneybeaches.csv")
+```
+
+If you want to try `here`, first notice the output when you load the `here` library. It gives you information on the current working directory. You can then use it to easily and intuitively load files.
+```{r}
+library(here)
+```
+
+The quotes show the folder structure from the root directory.
+```{r}
+sydneybeaches <-read_csv(here("homework", "data", "sydneybeaches.csv")) %>% clean_names()
+```
+
+2. Are these data "tidy" per the definitions of the tidyverse? How do you know? Are they in wide or long format?
+
+_The data appear to be tidy. Each variable has its own column, each observation has its own row, and each cell has its own value. Because the sites are repeated based on their observation date, the data are in long format._
+
+```{r}
+names(sydneybeaches)
+```
+
+3. We are only interested in the variables site, date, and enterococci_cfu_100ml. Make a new object focused on these variables only. Name the object `sydneybeaches_long`
+```{r}
+sydneybeaches_long <- sydneybeaches %>% 
+  select(site, date, enterococci_cfu_100ml)
+sydneybeaches_long
+```
+
+4. Pivot the data such that the dates are column names and each beach only appears once (wide format). Name the object `sydneybeaches_wide`
+```{r}
+sydneybeaches_wide <- sydneybeaches_long %>% 
+  pivot_wider(names_from=date,
+              values_from=enterococci_cfu_100ml)
+sydneybeaches_wide
+```
+
+5. Pivot the data back so that the dates are data and not column names.
+```{r}
+sydneybeaches_wide %>% 
+  pivot_longer(-site,
+               names_to="date",
+               values_to="enterococci_cfu_100ml"
+               )
+```
+
+6. We haven't dealt much with dates yet, but separate the date into columns day, month, and year. Do this on the `sydneybeaches_long` data.
+```{r}
+sydneybeaches_long %>% 
+  separate(date, into=c("day", "month", "year"), sep="/")
+```
+
+7. What is the average `enterococci_cfu_100ml` by year for each beach. Think about which data you will use- long or wide.
+```{r}
+mean_entero <- 
+  sydneybeaches_long %>% 
+  separate(date, into=c("day", "month", "year"), sep="/") %>% 
+  group_by(site, year) %>% 
+  summarize(mean_enterococci_cfu_100ml=mean(enterococci_cfu_100ml, na.rm=T))
+mean_entero
+```
+
+8. Make the output from question 7 easier to read by pivoting it to wide format.
+```{r}
+mean_entero %>% 
+  pivot_wider(names_from=site,
+              values_from=mean_enterococci_cfu_100ml)
+```
+
+9. What was the most polluted beach in 2013?
+```{r}
+mean_entero %>% 
+  pivot_wider(names_from=site,
+              values_from=mean_enterococci_cfu_100ml) %>% 
+  filter(year==2013) %>% 
+  pivot_longer(-year,
+               names_to = "site",
+               values_to = "mean_enterococci_cfu_100ml") %>% 
+  arrange(desc(mean_enterococci_cfu_100ml))
+```
+
+```{r}
+mean_entero %>% 
+  pivot_wider(names_from=site,
+              values_from=mean_enterococci_cfu_100ml) %>% 
+  filter(year==2013) %>% 
+  pivot_longer(-year,
+               names_to = "site",
+               values_to = "mean_enterococci_cfu_100ml") %>% 
+  slice_max(mean_enterococci_cfu_100ml, n=3)
+```
+
+## HW 9 
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(here)
+library(naniar)
+``` 
+
+For this homework, we will take a departure from biological data and use data about California colleges. These data are a subset of the national college scorecard (https://collegescorecard.ed.gov/data/). Load the `ca_college_data.csv` as a new object called `colleges`.
+```{r}
+colleges <- readr::read_csv("data/ca_college_data.csv") %>% janitor::clean_names()
+```
+
+The variables are a bit hard to decipher, here is a key:  
+
+INSTNM: Institution name  
+CITY: California city  
+STABBR: Location state  
+ZIP: Zip code  
+ADM_RATE: Admission rate  
+SAT_AVG: SAT average score  
+PCIP26: Percentage of degrees awarded in Biological And Biomedical Sciences  
+COSTT4_A: Annual cost of attendance  
+C150_4_POOLED: 4-year completion rate  
+PFTFTUG1_EF: Percentage of undergraduate students who are first-time, full-time degree/certificate-seeking undergraduate students  
+
+1. Use your preferred function(s) to have a look at the data and get an idea of its structure. Make sure you summarize NA's and determine whether or not the data are tidy. You may also consider dealing with any naming issues.
+```{r}
+glimpse(colleges)
+```
+
+```{r}
+names(colleges)
+```
+
+```{r}
+naniar::miss_var_summary(colleges)
+```
+
+2. Which cities in California have the highest number of colleges?
+```{r}
+colleges %>% 
+  count(city) %>% 
+  arrange(desc(n))
+```
+
+3. Based on your answer to #2, make a plot that shows the number of colleges in the top 10 cities.
+```{r}
+colleges %>% 
+  count(city) %>% 
+  top_n(10, n) %>% 
+  ggplot(aes(x=reorder(city,n), y=n))+
+  geom_col()+
+  coord_flip()
+```
+
+4. The column `COSTT4_A` is the annual cost of each institution. Which city has the highest average cost? Where is it located?
+```{r}
+colleges %>% 
+  group_by(city) %>% 
+  summarize(mean_cost_yr=mean(costt4_a, na.rm=TRUE),
+            total=n()) %>% 
+  arrange(desc(mean_cost_yr))
+```
+
+5. Based on your answer to #4, make a plot that compares the cost of the individual colleges in the most expensive city. Bonus! Add UC Davis here to see how it compares :>).
+```{r}
+colleges %>% 
+  filter(instnm== "University of California-Davis" | city=="Claremont" & costt4_a!="NA") %>% 
+  ggplot(aes(x=instnm, y=costt4_a)) + 
+  geom_col()+
+  coord_flip()
+```
+
+6. The column `ADM_RATE` is the admissions rate by college and `C150_4_POOLED` is the four-year completion rate. Use a scatterplot to show the relationship between these two variables. What do you think this means?
+```{r}
+colleges %>% 
+  ggplot(aes(x=adm_rate, y=c150_4_pooled))+
+  geom_point(na.rm=T)+
+  geom_smooth(method=lm, se=F, na.rm=T)
+```
+
+7. Is there a relationship between cost and four-year completion rate? (You don't need to do the stats, just produce a plot). What do you think this means?
+```{r}
+colleges %>% 
+  ggplot(aes(x=costt4_a, y=c150_4_pooled))+
+  geom_point(na.rm=T)+
+  geom_smooth(method=lm, se=F, na.rm=T)
+```
+
+8. The column titled `INSTNM` is the institution name. We are only interested in the University of California colleges. Make a new data frame that is restricted to UC institutions. You can remove `Hastings College of Law` and `UC San Francisco` as we are only interested in undergraduate institutions.
+```{r}
+univ_calif <- colleges %>% 
+  filter_all(any_vars(str_detect(., pattern = "University of California")))
+univ_calif
+```
+
+Remove `Hastings College of Law` and `UC San Francisco` and store the final data frame as a new object `univ_calif_final`.
+```{r}
+univ_calif_final <- univ_calif %>% 
+  filter(city!="San Francisco")
+univ_calif_final
+```
+
+Use `separate()` to separate institution name into two new columns "UNIV" and "CAMPUS".
+```{r}
+univ_calif_final <- univ_calif_final %>% 
+  separate(instnm, c("univ", "campus"), sep="-")
+univ_calif_final
+```
+
+9. The column `ADM_RATE` is the admissions rate by campus. Which UC has the lowest and highest admissions rates? Produce a numerical summary and an appropriate plot.
+```{r}
+univ_calif_final %>% 
+  select(campus, adm_rate) %>% 
+  arrange(adm_rate)
+```
+
+```{r}
+univ_calif_final %>% 
+  ggplot(aes(x=reorder(campus, adm_rate), y=adm_rate))+
+  geom_col()+
+  coord_flip()
+```
+
+10. If you wanted to get a degree in biological or biomedical sciences, which campus confers the majority of these degrees? Produce a numerical summary and an appropriate plot.
+```{r}
+univ_calif_final %>% 
+  select(campus, pcip26) %>% 
+  arrange(pcip26)
+```
+
+```{r}
+univ_calif_final %>% 
+  ggplot(aes(x=reorder(campus, pcip26), y=pcip26))+
+  geom_col()
+```
+
+##HW 10 
+
+**Insert solns here**
+
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(naniar)
+``` 
+
+## Desert Ecology
+For this assignment, we are going to use a modified data set on [desert ecology](http://esapubs.org/archive/ecol/E090/118/). The data are from: S. K. Morgan Ernest, Thomas J. Valone, and James H. Brown. 2009. Long-term monitoring and experimental manipulation of a Chihuahuan Desert ecosystem near Portal, Arizona, USA. Ecology 90:1708.
+```{r}
+deserts <- read_csv("data/surveys_complete.csv") %>% clean_names()
+```
+
+1. Use the function(s) of your choice to get an idea of its structure, including how NA's are treated. Are the data tidy?  
+```{r}
+glimpse(deserts) #structure of the data
+```
+
+```{r}
+miss_var_summary(deserts) #The NA's are represented by NA
+```
+
+```{r}
+summary(deserts)
+```
+
+```{r}
+deserts
+#the data is tidy! 
+# each variable has its own column  
+# each observation has its own row  
+# each value has its own cell  
+```
+
+
+
+2. How many genera and species are represented in the data? What are the total number of observations? Which species is most/ least frequently sampled in the study?
+```{r}
+deserts %>% 
+  summarize(n_genera = n_distinct(genus), #amount of genera in the dataset
+            n_species = n_distinct(species), #amount of distinct species in dataset
+            n_total_observations = n()) #total amount of observations
+```
+In the dataset: 26 genera, 40 species, 34,786 observations. 
+```{r}
+deserts %>% 
+  count(species) %>% #amount of observations for each species
+  arrange(n)
+```
+^Species that is the least frequently sampled have one observation. (clarki, scutalatus, tereticaudus, tigris, uniparens, viridis)
+
+```{r}
+deserts %>% 
+  count(species) %>%
+  arrange(desc(n)) #sort most to least observations
+```
+^Species that is the most frequently sampled merriami with 10,596!
+
+3. What is the proportion of taxa included in this study? Show a table and plot that reflects this count.
+
+```{r}
+deserts %>% 
+  count(taxa) %>% 
+  arrange(desc(n))
+```
+
+```{r}
+#another way to solve
+#taxa_prop <- deserts %>% 
+  #tabyl(taxa)
+#taxa_prop
+```
+
+```{r}
+deserts %>% 
+  ggplot(aes(x = taxa, fill = taxa)) +
+  geom_bar() + 
+  scale_y_log10() + 
+  labs(title = "Taxa Represented in Study",
+       x = "Taxonomic Group",
+       y = "Individuals") + 
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.75)) #move and resize labels
+```
+Rodents are studied the most among the taxa data we have available to us. 
+
+4. For the taxa included in the study, use the fill option to show the proportion of individuals sampled by `plot_type.`
+```{r}
+deserts %>% 
+  ggplot(aes(x = taxa, fill = plot_type))+ #this is the modified line to show the prop. of indiv. sampled by 'plot_type'
+  geom_bar()+
+  scale_y_log10()+ #fixes viewing for continuous data
+  labs(title = "Taxa Represented in Study", 
+       x = "Taxa", 
+       y = "Number of Observations",
+       fill = "Type of Plot") +
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.75))
+```
+
+5. What is the range of weight for each species included in the study? Remove any observations of weight that are NA so they do not show up in the plot.
+**I Found two ways to do this**
+```{r}
+deserts %>% 
+  filter(!weight=="NA") %>% 
+  ggplot(aes(x=weight, fill=species))+
+  geom_boxplot(na.rm = T, position="dodge")+
+  scale_y_log10()+
+  labs(title = "Weight by Species",
+       x= "Weight",
+       y= "Species")+
+  theme(plot.title=element_text(size=rel(1.5),hjust=0.5))
+```
+
+```{r}
+deserts %>% 
+  filter(weight != "NA") %>% 
+  unite(species_name, "genus", "species", sep = " ") %>% 
+  ggplot(aes(x = species_name, y = weight))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Weight by Species",
+       x = "Weight",
+       y = "Species Name")+
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5))
+```
+
+6. Add another layer to your answer from #5 using `geom_point` to get an idea of how many measurements were taken for each species.
+**I found two ways to do this**
+```{r}
+deserts %>% 
+  filter(!weight=="NA") %>% 
+  ggplot(aes(x=weight,y=species))+
+  geom_point(na.rm = T)+ #geom_point is used here instead!
+  labs(title = "Weight by Species",
+       x= "Weight",
+       y= "Species")+
+  theme(plot.title=element_text(size=rel(1.5),hjust=0.5))
+```
+
+```{r}
+deserts %>% 
+  filter(weight != "NA") %>% 
+  unite(species_name, "genus", "species", sep = " ") %>% 
+  ggplot(aes(x = species_name, y = weight))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Weight by Species",
+       x = "Weight",
+       y = "Species Name")+
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5))+
+  geom_point(aes(color = weight), size = 0.5) #Modified line of code that adds a scatter plot
+```
+
+
+7. [Dipodomys merriami](https://en.wikipedia.org/wiki/Merriam's_kangaroo_rat) is the most frequently sampled animal in the study. How have the number of observations of this species changed over the years included in the study?
+```{r}
+names(deserts)
+```
+```{r}
+deserts %>% 
+  count(year) %>% #creating counts of observations by year
+  ggplot(aes(x = year, y = n)) + #creating the plot
+  geom_point() + #creating the scatterplot
+  labs(title = "Number of Observations by Year",
+       x = "Year",
+       y = "Number of Observations") + #adding labels
+  theme(plot.title = element_text(size = rel(1.3), hjust = 0.5)) + #resizing and moving labels
+  geom_smooth(method = lm, se = T) #adding line of best fit
+```
+
+**I solved another way**
+As a bar plot it is difficult to tell how the number of species changed over time. It seems in this example that the amount of species fluctuated over time.
+```{r}
+deserts %>% 
+  filter(species_id=="DM") %>% 
+  group_by(year) %>% 
+  summarise(n_samples=n()) %>% 
+  ggplot(aes(x=as.factor(year),y=n_samples))+
+    geom_col()+
+  theme(axis.text.x = element_text(angle=45, hjust=1))+
+  labs(title = "DM Observations per Year",
+       x="Number of Observations",
+       y= "Year")
+```
+
+As time has gone on, the number of observations seems to have a positive correlation which could mean the more species were observed over time due to biological factors like predators typically preferring larger prey or the ability for Merriam's Kangaroos to produce up to three litters per year. 
+
+8. What is the relationship between `weight` and `hindfoot` length? Consider whether or not over plotting is an issue.
+```{r}
+deserts %>% 
+  ggplot(aes(x = weight, y = hindfoot_length)) + 
+  geom_jitter() + #reducing overplotting
+  labs(title = "Hindfoot Length vs Weight",
+       x = "Weight",
+       y = "Hindfoot Length") + #adding labels
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5)) + 
+  geom_smooth(method = lm, se = T)
+```
+There is a positive correlation between weight and hindfoot length.Hindfoot length will increase with weight. Overplotting is an issue. 
+
+**This is another method**
+```{r}
+deserts %>% 
+  ggplot(aes(x=weight,y=hindfoot_length))+
+  geom_point(na.rm=T,size=1.2)+
+  geom_smooth(method=lm,se=F)+
+  scale_y_log10()+
+   theme(axis.text.x = element_text(angle=45, hjust=1))+
+  labs(title = "Hindfoot Length vs. Weight",
+       x="Weight",
+       y= "Hindfoot Length")
+```
+
+
+9. Which two species have, on average, the highest weight? Once you have identified them, make a new column that is a ratio of `weight` to `hindfoot_length`. Make a plot that shows the range of this new ratio and fill by sex.
+```{r}
+deserts %>% 
+  group_by(species) %>% 
+  filter(!weight=="NA") %>% 
+  summarize(avg_weight = mean(weight, na.rm = T)) %>% 
+  arrange(desc(avg_weight)) %>% 
+  head(2, species) #displays the two species with highest average weight
+```
+The two species are albigula and spectabilis with the highest mean weight!
+
+**Plot**
+```{r}
+#New column with ratio of 'weight' to 'hind_foot' 
+high_weight_desert <- deserts %>% 
+  filter(species == "albigula" | species == "spectabilis") %>% 
+  mutate(w_hindfoot_length_ratio = weight / hindfoot_length)
+high_weight_desert 
+```
+
+
+```{r}
+high_weight_desert %>% 
+  filter(sex != "NA") %>% 
+  ggplot(aes(x = species, y = w_hindfoot_length_ratio, fill = sex))+
+  geom_boxplot(alpha = 0.5) #use boxplot because we are finding a range of variables
+```
+Another way to do the **Plot**
+
+```{r}
+#deserts %>% 
+  #filter(species_id=="DS" | species_id =="NL") %>% 
+ # filter(!weight=="NA" & !hindfoot_length=="NA" & !sex=="NA") %>% #we use 'and' for the data with NA values for our variables of interest. 
+ # mutate(ratio=weight/hindfoot_length) %>%
+ # select(ratio,species_id,weight,sex) %>% 
+ # ggplot(aes(x=ratio,fill=sex))+
+  #geom_boxplot()+
+  #theme(axis.text.x = element_text(angle=45, hjust=1))+
+  #labs(title = "Weight to Foot Ratios",
+       #x="Ratio")
+```
+
+10. Make one plot of your choice! Make sure to include at least two of the aesthetics options you have learned.
+
+```{r}
+deserts %>% 
+  filter(genus == "Sigmodon" & species== "hispidus") %>% 
+  filter(sex!="NA") %>% 
+  ggplot(aes(year, fill=sex))+
+  geom_bar(position = "dodge")+
+  scale_y_log10()+ #for ease of viewing
+    labs(title = "Sigmodon hispidus vs. Time",
+       x = "Year",
+       y = "Count")
+```
+This code shows how the number of observations of Sigmodon hispidus has changed over time. I grouped and filled by sex. 
+
+##HW 11 
+
+**Insert solns here**
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(here)
+library(naniar)
+``` 
+
+```{r}
+options(scipen = 999)
+```
+
+## Resources
+The idea for this assignment came from [Rebecca Barter's](http://www.rebeccabarter.com/blog/2017-11-17-ggplot2_tutorial/) ggplot tutorial so if you get stuck this is a good place to have a look.  
+
+## Gapminder
+For this assignment, we are going to use the dataset [gapminder](https://cran.r-project.org/web/packages/gapminder/index.html). Gapminder includes information about economics, population, and life expectancy from countries all over the world. You will need to install it before use. This is the same data that we will use for midterm 2 so this is good practice.
+```{r}
+#install.packages("gapminder")
+library("gapminder")
+```
+
+## Questions
+The questions below are open-ended and have many possible solutions. Your approach should, where appropriate, include numerical summaries and visuals. Be creative; assume you are building an analysis that you would ultimately present to an audience of stakeholders. Feel free to try out different `geoms` if they more clearly present your results.  
+
+**1. Use the function(s) of your choice to get an idea of the overall structure of the data frame, including its dimensions, column names, variable classes, etc. As part of this, determine how NAs are treated in the data.**
+```{r}
+gapminder <- gapminder %>% clean_names() #be able to view gapminder
+```
+
+```{r}
+glimpse(gapminder) #overall structure
+```
+```{r}
+dim(gapminder) #dimensions 6var.; 1704 obs.
+```
+```{r}
+names(gapminder) #names of columns
+```
+#check for NAs 
+```{r}
+miss_var_summary(gapminder)
+```
+
+```{r}
+summary(gapminder)
+```
+
+**2. Among the interesting variables in gapminder is life expectancy. How has global life expectancy changed between 1952 and 2007?**
+```{r}
+gapminder %>%
+  mutate(year = as.factor(year)) %>% 
+  group_by(year) %>% 
+  ggplot(aes(x = year, y = life_exp)) +
+  geom_boxplot(fill = "green4", alpha = 0.6) +
+  labs(title = "Life Expectancy vs. Time",
+       x = NULL,
+       y = "Age") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+It seems to have increased over the years! 
+
+**3. How do the distributions of life expectancy compare for the years 1952 and 2007?**
+```{r}
+gapminder %>% 
+  filter(year == 1952 | year == 2007) %>% 
+  mutate(year = as.factor(year)) %>% #year changed to fct from int
+  group_by(year) %>% 
+  ggplot(aes(x = year, y = life_exp))+
+  geom_boxplot(fill="navy", alpha = 0.3)+
+  labs(title = "Life Expectancy Comparing 1952 to 2007", 
+       x = NULL, 
+       y = "Age")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+People live longer now than they did in the past!
+
+**4. Your answer above doesn't tell the whole story since life expectancy varies by region. Make a summary that shows the min, mean, and max life expectancy by continent for all years represented in the data.**
+```{r}
+gapminder %>% 
+  group_by(continent, year) %>% 
+  summarize(min = min(life_exp),
+            mean = mean(life_exp), 
+            max = max(life_exp))
+```
+
+**5. How has life expectancy changed between 1952-2007 for each continent?**
+```{r}
+gapminder %>% 
+  mutate(year = as.factor(year)) %>% 
+  ggplot(aes(x = year, y  = life_exp))+
+  geom_boxplot(fill = "steelblue2")+
+  facet_wrap(~continent)+
+  labs(title = "Life Expectancy from 1952 to 2007 in Each Continent",
+       x = NULL, 
+       y = "Age")+
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_text(angle = 60, hjust = 1))+ 
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+The all the continents seem to follow the same trend that life expectancy is increasing as time gets later and later. 
+
+**6. We are interested in the relationship between per capita GDP and life expectancy; i.e. does having more money help you live longer?**
+```{r}
+gapminder %>% 
+  ggplot(aes(x = gdp_percap, y = life_exp, color=continent))+
+  geom_point()+
+  geom_smooth(method = lm, color = "darkgrey")+
+  scale_x_log10()+
+  labs(title = "GDP per Capita vs Life Expectancy", 
+       x = "GDP per Capita", 
+       y = "Life Expectancy")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+There is a positive correlation meaning that having more money could allow you to live longer (maybe you have better access to medical coverage).  
+
+**7. Which countries have had the largest population growth since 1952?**
+```{r}
+gapminder %>% 
+  group_by(country) %>% 
+  summarise(min = min(pop), 
+            max = max(pop), 
+            change = max - min) %>% 
+  arrange(desc(change))
+```
+^The countries are listed here! China has one of the largest changes. 
+
+```{r}
+#This is another way to approach the problem! 
+gapminder %>% 
+  filter(year == "1952" | year == "2007") %>% 
+  select(country, continent, year, pop) %>% 
+  pivot_wider(names_from = year,
+              values_from = pop) %>% 
+  clean_names() %>% 
+  mutate(pop_change = x2007 - x1952) %>% 
+  arrange(desc(pop_change)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = country, y = pop_change, fill = country)) + #creating the plot
+  geom_col() + #creating a boxplot
+  coord_flip() +
+  scale_fill_brewer(palette = "BuPu") + #choosing the color scheme
+  labs(title = "Population Growth for Countries between 1952 and 2007",
+       x = "Country",
+       y = "Population Change",
+       fill = "Country") + #adding labels
+  theme(plot.title = element_text(size = rel(1.3), hjust = 0.8))+
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+
+**8. Use your results from the question above to plot population growth for the top five countries since 1952.**
+```{r}
+gapminder %>%
+  filter(country == "China" | country == "India" | country == "United States" | country == "Indonesia" | country == "Brazil") %>%
+  ggplot(aes(x = year, y = pop)) +
+  geom_line(aes(color = country)) +
+  labs(title = "Population Growth",
+       y = "Population",
+       x = NULL) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+**9. How does per capita GDP growth compare between these same five countries?**
+```{r}
+gapminder %>%
+  filter(country == "China" | country == "India" | country == "United States" | country == "Indonesia" | country == "Brazil") %>%
+  ggplot(aes(x = year)) +
+  geom_line(aes(y = gdp_percap, color = country)) +
+  labs(title = "GDP Per Capita Over Time",
+       y = "GDP Per Capita",
+       x = NULL) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+**10. Make one plot of your choice that uses faceting!**
+```{r}
+gapminder %>% 
+  ggplot(aes(x = continent, y = pop))+
+  geom_boxplot()+
+  facet_wrap(~year)+
+  labs(title = "Population of Continents Over Time", 
+       y = "Population", 
+       x = NULL)+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+#facet_wrap makes a ribbon of panels by a specified categorical variable. This shows all the continenets through the years and compares their population. 
+```
+
+#Lab 8 to 12
+
+#Lab 8.1 
+Let's say we were interested in how body mass varied by island. It is reasonable to assume that the islands are different, so maybe the penguins are as well.
+```{r}
+penguins %>% 
+  group_by(island) %>% 
+  summarize(mean_body_mass_g=mean(body_mass_g, na.rm=T)) # remember to remove those NA's!
+```
+
+What if we are interested in the number of observations (penguins) by species and island?
+```{r}
+penguins %>% 
+  group_by(island, species) %>% 
+  summarize(n_penguins=n(), .groups = 'keep')
+```
+
+##Count : shows the number of observations
+```{r}
+penguins %>% 
+  count(island, species)
+```
+Note: **tabyl** will also produce counts
+
+##Across()
+```{r}
+penguins %>%
+  summarize(across(c(species, island, sex), n_distinct))
+```
+
+All variables that include "bill"...all of the other dplyr operators also work.
+```{r}
+penguins %>%
+  summarise(across(starts_with("bill"), n_distinct))
+```
+Summarize across all variables 
+```{r}
+penguins %>%
+  summarise_all(n_distinct)
+```
+
+#Lab 8.2 
+Here is a new one for you using the `purrr` package. This will give you a quick summary of the number of NA's in each variable.
+```{r}
+life_history %>% 
+  map_df(~ sum(is.na(.))) #tell where all the NAs ; R doesn't see -999 as NAs 
+```
+
+## `naniar`
+`naniar` is a package that is built to manage NA's. Many of the functions it performs can also be performed using tidyverse functions, but it does provide some interesting alternatives. 
+
+`miss_var_summary` provides a clean summary of NA's across the data frame.
+```{r}
+naniar::miss_var_summary(life_history) #use naniar package and get a missing variable summary of the life_history
+#pct is the percent missing
+```
+
+Note: sometimes NAs can be represented as different numbers. 
+Let's use `mutate()` and `na_if()` to replace 0's with NA's in `max_life`.
+```{r}
+life_history_no_nas <- life_history_no_nas %>% 
+  mutate(max_life=na_if(max_life, 0))
+```
+
+We can also use `miss_var_summary` with `group_by()`. This helps us better evaluate where NA's are in the data.
+```{r}
+life_history %>%
+  group_by(order) %>%
+  #select(order, wean_mass) %>% 
+  miss_var_summary(order=T)
+```
+
+`naniar` also has a nice replace function which will allow you to precisely control which values you want replaced with NA's in each variable.
+```{r}
+life_history %>% 
+  replace_with_na(replace = list(newborn = "not measured", 
+                                 weaning= -999, 
+                                 wean_mass= -999, 
+                                 afr= -999, 
+                                 max_life= 0, 
+                                 litter_size= -999, 
+                                 gestation= -999, 
+                                 mass= -999)) %>% 
+miss_var_summary()
+#makes replacement of NA's specific to a variable
+```
+
+You can also use naniar to replace a specific value (like -999) with NA across the entire data set.  
+```{r}
+life_history %>% #going back to the original data
+  replace_with_na_all(condition = ~.x == -999)%>% 
+miss_var_summary()
+```
+
+Finally, naniar has some built-in examples of common values or character strings used to represent NA's. The chunk below will use these built-in parameters to replace NA's across the entire data set.
+```{r}
+common_na_strings
+```
+
+```{r}
+common_na_numbers
+```
+
+```{r}
+life_history %>% #going back to the original data
+  replace_with_na_all(condition = ~.x %in% c(common_na_strings, common_na_numbers)) %>% 
+  mutate(newborn=na_if(newborn, "not measured"))
+```
+
+## Visualizing NAs
+There is another package `visdat` that can be used to visualize the proportion of different classes of data, including missing data. But, it is limited by size.
+
+## Dealing with NA's in advance
+If you are sure that you know how NA's are treated in the data, then you can deal with them in advance using `na()` as part of the `readr` package.
+
+#Alternative
+```{r}
+read_csv(file = "data/mammal_lifehistories_v3.csv", na = c("NA", " ", ".", "-999", "not measured")) %>% clean_names()
+```
+
+#Lab 9.1 
+https://cran.r-project.org/web/packages/tidyr/vignettes/pivot.html
+##Pivot data from wide to long.  
+pivot_longer() "lengthens" data, increasing the number of rows and decreasing the number of columns.
+```{r}
+#pivot_longer() makes datasets LONGER by increasing
+#^This command shifts data from wide to long
+#The problem is that column names may represent values of a variable! 
+```
+Rules:  
++ `pivot_longer`(cols, names_to, values_to)
++ `cols` - Columns to pivot to longer format
++ `names_to` - Name of the new column; it will contain the column names of gathered columns as values
++ `values_to` - Name of the new column; it will contain the data stored in the values of gathered columns
+
+***REVIEW 9.1 EXAMPLE***
+***LAB10 Warmup***
+Simulated malaria data #Load the data 
+```{r}
+malaria <- read_csv("data/malaria.csv") %>% clean_names()
+```
+
+```{r}
+names(malaria)
+```
+
+```{r}
+head(malaria) #age range is specified for those cases because column names contain information. 
+```
+
+#rdt refers to rapid diagnostic test 
+##Data tidy
+Pivot longer
+```{r}
+malaria_long <- malaria %>% 
+  pivot_longer(cols=starts_with("malaria_rdt"),
+               names_to = "age_class",
+               values_to = "cases") %>% 
+  select(newid, data_date, submitted_date, location_name, province, district, age_class, cases)
+```
+^There is still work to make these cleaner like age_class is ugly. 
+
+Which district had the highest number of cases on July 30, 2020?
+```{r}
+malaria_long %>% 
+  filter(data_date=="2020-07-30") %>% 
+  group_by(district) %>% 
+  summarize(tot_cases=sum(cases, na.rm=T)) %>% 
+  arrange(-tot_cases) #this is another way to do descending order. 
+```
+
+
+
+##Tidy Data 
+REVIEW CHAPTER 12 
+[chapter 12 of the data science text](https://r4ds.had.co.nz/tidy-data.html)
+`Tidy` data follows three conventions:   
+(1) each variable has its own column  
+(2) each observation has its own row  
+(3) each value has its own cell  
+
+## Example 3: more than one variable in a column name
+Example: exp1rep1
+
+#Lab 9.2 
+##pivot data from long to wide 
+pivot_wider() "widens" data, increasing the number of columns and decreasing the number of rows.
+```{r}
+#column namess are the problem. there is (more than one) value per cell and the columns represent values.
+```
+
+You use `pivot_wider()` when you have an observation scattered across multiple rows. In the example below, `cases` and `population` represent variable names not observations.  
+
+Rules:  
++ `pivot_wider`(names_from, values_from)  
++ `names_from` - Values in the `names_from` column will become new column names  
++ `values_from` - Cell values will be taken from the `values_from` column  
+
+```{r}
+tb_data %>% 
+  pivot_wider(names_from = "key", #the observations under key will become new columns; key have two names cases and population
+              values_from = "value") #the values under value will be moved to the new columns
+```
+
+Example Pivot_Wider
+```{r}
+gene_exp <- read_csv("data/gene_exp.csv")
+gene_exp
+```
+#there are more than one variable in a column (treatment and control)
+```{r}
+gene_exp %>% 
+  pivot_wider(names_from = "type", #has two values in the type column which are  treatment and control
+              values_from = "L4_values")
+```
+
+`separate()` needs to know which column you want to split, the names of the new columns, and what to look for in terms of breaks in the data.
+```{r}
+heartrate2 %>% 
+  separate(patient, into= c("patient", "sex"), sep = "_") #separate patient into two new variables patient and sex
+```
+
+`unite()` is the opposite of separate(). Its syntax is straightforward. You only need to give a new column name and then list the columns to combine with a separation character. 
+```{r}
+heartrate3 %>% 
+  unite(patient_sex, "patient", "sex", sep=" ") #not super common but, could be a way to present the data
+```
+
+#Lab 10.1 
+ [ggplot2 cheatsheet](https://posit.co/resources/cheatsheets/)  ; this is apart of the tidyverse
+ 
+In short, **plot= data + geom_ + aesthetics**.  
+
+#think of geom as type like box plot, dot plot etc. 
+#aesthetics can be like what the x and y axis are etc. 
+```{r}
+ggplot(data=iris, #specify the data
+       mapping=aes(x=Species, y=Petal.Length))+ #map the aesthetics
+  geom_boxplot() #add the plot type
+```
+
+## Data Types 
++ `discrete` quantitative data that only contains integers
++ `continuous` quantitative data that can take any numerical value
++ `categorical` qualitative data that can take on a limited number of values
+
+```{r}
+ggplot(data=homerange, #specify the data
+       mapping=aes(x=log10.mass, y=log10.hra))+ #map the aesthetics
+  geom_point() #add the plot type; this is a scatterplot
+#as mass goes up the homerange increases 
+```
+
+`geom_jitter()` is similar to `geom_point()` but it helps with over plotting by adding some random noise to the data and separating some of the individual points.
+#geom_jitter() can be be used for scatter plot
+```{r}
+ggplot(data=homerange, mapping=aes(x=log10.mass, y=log10.hra))+
+  geom_jitter() #adds some random noise
+#if the dataset is super big could be a problem called overplotting. 
+```
+
+To add a regression (best of fit) line, we just add another layer.
+```{r}
+ggplot(data=homerange, mapping=aes(x=log10.mass, y=log10.hra))+
+  geom_point()+
+  geom_smooth(method=lm, se=T) #add a regression line
+```
+#There is a warning if leave geom_point() empty ^. if you don't put na.rm=t; by default ggplot will pull these out
+
+### Bar Plot: `geom_bar()`
+The simplest type of bar plot counts the number of observations in a categorical variable.Build bar plots that show counts of observations. 
+
+Also notice that we can use pipes! The `mapping=` function is implied by `aes` and so is often left out. 
+```{r}
+homerange %>% 
+  ggplot(aes(x=trophic.guild)) + #there is only one variable in this plot. noteL the x= is not needed. 
+  geom_bar() #good for counts
+```
+#You cannot make a bar plot with continuous data. 
+
+### Bar Plot: `geom_col()`
+Unlike `geom_bar()`, `geom_col()` allows us to specify an x-axis and a y-axis.
+```{r}
+homerange %>% 
+  filter(family=="salmonidae") %>%
+  select(common.name, log10.mass) %>% 
+  ggplot(aes(y=common.name, x=log10.mass))+ #notice the switch in x and y
+  geom_col()
+```
+
+Make a bar plot that shows the masses of the top 10 smallest mammals.
+```{r}
+homerange %>% 
+  filter(class=="mammalia") %>% 
+  top_n(-10, log10.mass) %>% 
+  ggplot(aes(x=common.name, y=log10.mass))+
+  geom_col()+
+coord_flip() #add a + at the end of each layer
+```
+
+coord_flip() this switches the x and y axis
+
+## Bar Plots
+Bar plots count the number of observations in a categorical variable. What is the difference between `geom_bar` and `geom_col`? Make two bar plots showing the number of observations for each order using each geom type.
+**The xaxis are different for col it's n and for bar its count both have order on the y axis after the coordflip**
+
+`geom_col`
+```{r}
+life_history %>% 
+  count(order, sort = T) %>% #this is the same as arrange ; count allows produce x & y 
+  ggplot(aes(x=order, y=n))+ 
+  geom_col()+ #allows specify x and y 
+coord_flip()
+```
+
+`geom_bar`
+```{r}
+life_history %>% 
+  ggplot(aes(x=order))+ #counting observations in the categorical variable order
+  geom_bar()+
+  coord_flip()
+```
+
+#Lab 10.2 
+***Good Examples***
+Boxplots help us visualize a range of values. So, on the x-axis we typically have something categorical and the y-axis is the range.
+
+`geom_boxplot()` is the geom type for a standard box plot. The center line in each box represents the median, not the mean.
+```{r}
+homerange %>% 
+  ggplot(aes(x = class, y = log10.mass)) +
+  geom_boxplot() #shows the same information as the code chunk above. 
+#Note: the line in the middle is the median. 
+```
+
+#Lab 11.1 
+## Resources
+- [ggplot2 cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+- [`ggplot` themes](https://ggplot2.tidyverse.org/reference/ggtheme.html)
+- [Rebecca Barter `ggplot` Tutorial](http://www.rebeccabarter.com/blog/2017-11-17-ggplot2_tutorial/)
+
+**Remove Scientific Notation**  
+```{r}
+options(scipen=999)#cancels scientific notation for the session
+```
+
+**Turn the axis into a log scale**
+```{r}
+scale_y_log10() #new function added after geom_ or coor_flip
+```
+
+**Adjust x-axis labels to make them more readable using 'reorder'**
+```{r}
+life_history %>% 
+  group_by(order) %>% 
+  summarize(mean_mass=mean(mass, na.rm=T)) %>% 
+  ggplot(aes(x=reorder(order, mean_mass), y=mean_mass))+ #reorder the x-axis
+  geom_col()+
+  coord_flip()+
+  scale_y_log10()
+```
+
+**Continuous Variables = numerical variables that can assume any value within a specified range. They can take on an infinite number of values between two endpoints. The values they assume do not have fixed intervals and can be represented with any degree of precision via fractions or decimal points.**
+e.g. age and height 
+
+## Scatterplots
+Scatter plots allow for comparisons of two continuous variables. Make a scatterplot below that compares gestation time and weaning mass.
+```{r}
+life_history %>% 
+  ggplot(aes(x=gestation, y=wean_mass))+
+  geom_jitter(na.rm = T)+ #prevents overplotting 
+  scale_y_log10() #add this at the end for the outlier before including this line
+```
+
+## Boxplots
+Box plots help us visualize a range of values. So, on the x-axis we typically have something categorical and the y-axis is the range. Let's make a box plot that compares mass across taxonomic orders.
+```{r}
+ggplot(data=life_history, 
+       mapping=aes(x=order, y=mass))+ 
+  geom_boxplot(na.rm = T)+
+  coord_flip()+
+  scale_y_log10()
+```
+^Has outliers before adding the scale_y_log10 function
+
+**A categorical variable(qualitative variable) is a variable with a set number of groups (gender, colors of the rainbow, brands of cereal), while a numeric variable is generally something that can be measured (height, weight, miles per hour)**
+
+## Aesthetics: Labels
+Labeling x & y axis. 
+ex: compare age and height 
+```{r}
+elephants %>% 
+  ggplot(aes(x=age, y=height)) + 
+  geom_point() + #since using two continuous variables 
+  geom_smooth(method=lm, se=F)+ #method is linear model, dont show standard error 
+  labs(title="Elephant Age vs. Height", #
+       x="Age",
+       y="Height")
+```
+**to add custom labels, use the 'labs' command**
+
+Adjust size and face of the text using 'theme()'. The 'rel()' option changes the relative size of the title to keep things consistent. 'hjust' allows control of the title position. 
+```{r}
+elephants %>% 
+  ggplot(aes(x=age, y=height))+
+  geom_point()+
+  geom_smooth(method = lm, se = F)+ #method is linear model, dont show standard error 
+  labs(title = "Elephant Age vs. Height", 
+       x = "Age (years)",
+       y = "Height (cm)")+
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5)) #relative makes everything bigger. hjust goes left when 0 and hjust goes to the right when hjust is 1
+```
+
+**Note: Aesthetic can be assigned to numeric or categorical data**
+'fill'; fill by the SAME variable we are plotting 
+```{r}
+elephants %>% 
+  ggplot(aes(x=sex, fill=sex))+ #fill is a grouping option
+  geom_bar()
+```
+
+'size' adjusts the size of points relative to a continuous variable
+```{r}
+life_history %>% 
+  ggplot(aes(x=gestation, y=log10(mass), size=mass))+ #added log10 to nest within the ggplot function; size is relative to the mass being plotted. 
+#The biggest mass is the biggest dot
+  geom_point(na.rm=T)
+```
+
+#Lab 11.2 
+
+##Useful aesthetics
+Store a plot as a new object then, able to experiment with geom and aesthetics
+
+```{r}
+p <- homerange %>% 
+  ggplot(aes(x= log10.mass, y= log10.hra)) #stored as an object p
+```
+^compare log10.mass and log10.hra
+
+Play with point size by adjusting the `size` argument.
+```{r}
+p + geom_point(size=1.25) #adust the size of the dots
+```
+
+We can color the points by a categorical variable.
+```{r}
+p + geom_point(aes(color = thermoregulation), size= 1.5)
+#for scatterplots, color is the same as fill in barplots
+#p compares two continuous variables and then color the dots by a categorical one
+```
+
+We can also map shapes to another categorical variable.
+```{r}
+p + geom_point(aes(color = thermoregulation, shape=thermoregulation), size= 1.5)
+#changes the shape by default
+```
+
+
+##Barplot and multiple variables 
+Let's start by counting how many observations we have in each taxonomic group.
+```{r}
+homerange %>% count(taxon, sort=T) #counts observations in taxon
+#there are 9 different taxa
+```
+
+Now let's make a bar plot of these data.
+```{r}
+homerange %>% 
+  ggplot(aes(x=taxon))+
+  geom_bar()+
+  coord_flip()+
+  labs(title = "Observations by Taxon", 
+       x = "Taxonomic Group")
+```
+
+By specifying `fill=trophic.guild` we build a stacked bar plot that shows the proportion of a given taxonomic group that is an herbivore or carnivore.
+```{r}
+homerange %>% 
+  ggplot(aes(x=taxon, fill=trophic.guild))+ #now we can see proportion of carnivores and herbivores
+  geom_bar()+
+  coord_flip()+
+  labs(title = "Observations by Taxon", 
+       x = "Taxonomic Group")
+```
+
+We can also have counts of each trophic guild within taxonomic group shown side-by-side by specifying `position="dodge"`.
+```{r}
+homerange %>% 
+  ggplot(aes(x=taxon, fill=trophic.guild))+ 
+  geom_bar(position="dodge")+ #this now gives the side by side
+  coord_flip()+
+  labs(title = "Observations by Taxon", 
+       x = "Taxonomic Group")
+```
+
+Here is the same plot oriented vertically.
+```{r}
+homerange %>% 
+  ggplot(aes(x=taxon, fill=trophic.guild))+ 
+  geom_bar(position="dodge")+ 
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))+ #this changes the view
+  labs(title = "Observations by Taxon", 
+       x = "Taxonomic Group")
+
+```
+
+We can also scale all bars to a percentage.
+```{r}
+homerange %>% 
+  ggplot(aes(x = taxon, fill = trophic.guild))+
+  geom_bar(position = position_fill())+ 
+  scale_y_continuous(labels = scales::percent)+ #this is the modified line
+  coord_flip()
+```
+
+## Using `group`
+In addition to `fill`, `group` is an aesthetic that accomplishes the same function but does not add color.
+
+Here is a box plot that shows `log10.mass` by taxonomic `class.`
+```{r}
+homerange %>% 
+  ggplot(aes(x = class, y = log10.mass)) +
+  geom_boxplot()
+```
+
+I use `group` to make individual box plots for each taxon within class.
+```{r}
+homerange %>% 
+  ggplot(aes(x = class, y = log10.mass, group = taxon)) +
+  geom_boxplot()
+```
+
+I can also use `fill` to associate the different taxa with a color coded key.
+```{r}
+homerange %>% 
+  ggplot(aes(x = class, y = log10.mass, group = taxon, fill=taxon)) + #group = taxon then no color but, fill gives you the color. 
+#group and fill do the same thing but, group doesn't color in the taxon.
+  geom_boxplot()
+```
+
+```{r}
+homerange %>% 
+  ggplot(aes(x = class, y = log10.mass, group = taxon, fill=taxon)) + 
+  geom_boxplot(alpha=0.6) #the alpha adds some transparency
+```
+^'alpha()' shows transparency! 
+
+#Practice Q's
+1. Make a bar plot that shows counts of individuals by island. Fill by species, and try both a stacked bar plot and `position="dodge"`.  
+2. Make another bar plot that shows the number of individuals by sex on each island?  
+**To remove NA's you can do it after the dataset name %>% filter(sex!="NA")**
+
+
+#Lab 12.1  
+## Resources
+- [ggplot2 cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+- [R for Data Science](https://r4ds.had.co.nz/)
+- [R Cookbook](http://www.cookbook-r.com/)
+- [`ggplot` themes](https://ggplot2.tidyverse.org/reference/ggtheme.html)
+- [Rebecca Barter `ggplot` Tutorial](http://www.rebeccabarter.com/blog/2017-11-17-ggplot2_tutorial/)
+- [R Color Brewer](http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3)  
+## Install `RColorBrewer`, `paletteer`, and `ggthemes`
+`RColorBrewer` and `paletteer` are helpful in selecting palettes of color that work with your data. Please install these now, we will work with them in part 2 of today's lab.
+```{r, eval=FALSE, echo=TRUE}
+#install.packages("RColorBrewer")
+#install.packages("paletteer")
+#install.packages("ggthemes")
+```
+
+## Review
+1. Use the `homerange` data to make a boxplot that shows the range of `log10.mass` by taxonomic class.  
+2. Now, add a layer to this plot that fills color for each box by taxonomic class  
+3. Use `group` to show the range of `log10.mass` by taxon.  
+4. Use `fill` to show the range of `log10.mass` by taxon with color codes.  
+
+## Line plots **potential problem for midterm2**
+Line plots are great when you need to show changes over time. Here we look at the number of samples for species DM and DS over the years represented in the `deserts` data. This takes some careful thought- we want to know how sampling has changed over time for these two species.  
+Let's start by making a clear x and y so we know what we are going to plot.
+```{r}
+deserts %>% 
+  filter(species_id=="DM" | species_id=="DS") %>% #interested in two variables use filter
+  mutate(year=as.factor(year)) %>%  #shortcut: change the year variable to a factor; because year as a numeric is complicated because they represent individual sampling points and not continuous numeric
+  group_by(year, species_id) %>% 
+  summarize(n=n(), .groups = 'keep') %>% 
+  pivot_wider(names_from = species_id, values_from = n) #makes data nicer
+#we are interested in how sampling has changed over time.
+```
+
+```{r}
+deserts %>% 
+  filter(species_id=="DM" | species_id=="DS") %>% #interested in two variables use filter
+  mutate(year=as.factor(year)) %>%  #shortcut: change the year variable to a factor; because year as a numeric is complicated because they represent individual sampling points and not continuous numeric
+  group_by(year, species_id) %>% 
+  summarize(n=n(), .groups = 'keep') %>% 
+  ggplot(aes(x=year, y=n, group=species_id, color=species_id))+
+  geom_line()+
+  geom_point(shape=2)+ #new aesthetic; you can experiment with diff shapes by changing the number
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))+ #angle the years 
+  labs(title = "Number of Samples for Species DM & DS",
+       x = "Year", 
+       y = "n")
+```
+
+## Histograms  
+Show the distribution of continuous variables. 
+A histogram 'bins' the data and you specify the number of bins that encompass a range of observations.  
+
+Note: For something like grades, this is easy because the number of bins corresponds to the grades A-F. By default, R uses a formula to calculate the number of bins but some adjustment may be required.  
+
+What does the distribution of body mass look like in the `homerange` data?
+```{r}
+homerange %>% 
+  ggplot(aes(x = log10.mass)) +
+  geom_histogram()+ #we can adjust the number of bins with the bins argument (put bins = 30 in parentheses and mess with the # )
+  labs(title = "Distribution of Body Mass")
+```
+
+This shows all 657 of R's built-in colors. Notice that `color` and `fill` do different things!
+```{r}
+#grDevices::colors() 
+#These are all the colors in R 
+```
+
+**Color vs. Fill**
+```{r}
+homerange %>% 
+  ggplot(aes(x = log10.mass)) +
+  geom_histogram(color = "seagreen", fill = "steelblue1", bins=10)+
+  labs(title = "Distribution of Body Mass")
+#Color is the outline and fill is the color 
+```
+
+## Density plots 
+Similar to histograms but, use a smoothing function. They do NOT use bins.  
+'geom_density()' 
+
+```{r}
+homerange %>% 
+  ggplot(aes(x = log10.mass)) +
+  geom_density(fill="deepskyblue4", alpha  =0.4, color = "black")+ #alpha is the transparency
+  labs(title = "Distribution of Body Mass")
+```
+
+###Density Plot + Histogram 
+```{r}
+homerange %>% 
+  ggplot(aes(x=log10.mass)) +
+  geom_histogram(aes(y = after_stat(density)), fill = "deepskyblue4", alpha = 0.4, color = "black")+ #ignore the y line
+  geom_density(color = "red")+ #new layer
+  labs(title = "Distribution of Body Mass")
+
+```
+
+Note from Prof: Use the same color and the same fill consistently throughout! 
+## Create Categories with mutate and case_when()
+`case_when()` is a very handy function from `dplyr` which allows us to calculate a new variable from other variables.  
+We use `case_when()` within `mutate()` to do this.  
+`case_when()` allows us to specify multiple conditions.   
+Ex: Let's reclassify the body mass variable into a new factor variable with small, medium, and large animals. In this case, we are making a continuous variable into a categorical variable.  
+```{r}
+homerange %>% 
+  select(log10.mass) %>% #this is a continuous variable
+  summarize(min=min(log10.mass),
+            max= max(log10.mass))
+```
+
+```{r}
+summary(homerange$log10.mass) #another way to get min and max
+```
+
+Here we check how the newly created body mass categories compare across `trophic.guild`. 
+```{r}
+homerange %>% 
+  mutate(mass_category=case_when(log10.mass<=1.75 ~ "small",#mass_category is the new variable; put log10.mass into new value small in mass_category
+                                 log10.mass>1.75 & log10.mass <=2.75 ~ "medium",
+                                 log10.mass>2.75 ~ "large")) %>% 
+  ggplot(aes(x=mass_category, fill=trophic.guild))+
+  geom_bar(position = "dodge") #puts it side by side
+
+#Note: the variable log10.mass is continuous
+```
+## Practice
+1. Use case_when() to make a new column `range_category` that breaks down `log10.hra` into very small, small, medium, and large classes based on quartile.  
+2. Make a plot that shows how many and which taxonomic classes are represented in each `range_category`.  
+3. Isolate the small `range_category` and plot the range of `log10.mass` by taxonomic class.  
+
+#Lab 12.2 
+**DO THE PRACTICE AT THE VERY END**  
+## ggplot themes
+There are many options to change the theme of your plots within ggplot. Have a look [here]https://ggplot2.tidyverse.org/reference/ggtheme.html) for a list of the themes.  **many themes**  
+Let's start by building a simple barplot.  
+```{r}
+p <- homerange %>% 
+  ggplot(aes(x=taxon, fill=trophic.guild))+
+  geom_bar(na.rm=T, position="dodge")
+#store a plot as an object! 
+```
+
+Have a look at the `linedraw` theme; I am adding it as another layer.
+```{r}
+p + theme_linedraw()+ #take p + the theme linedraw
+  theme(axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL,
+       y= "n",
+       fill= "Trophic Guild")
+```
+## Practice
+1. Build a scatterplot that compares `log10.mass` and `log10.preymass`. Color the points by `taxon`. Store this plot as object `q`.
+**fill does not work in scatterplots**  
+2. Use plot `q` but add the classic theme.  
+## Legends
+There are lots of options to manipulate legends. Have a look [here](http://www.sthda.com/english/wiki/ggplot2-legend-easy-steps-to-change-the-position-and-the-appearance-of-a-graph-legend-in-r-software).
+```{r}
+p+theme_linedraw()+
+  theme(legend.position = "bottom", #legend.position puts the legend at the bottom (left, right, top etc.); this is aesthetic choice
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL, #removes label from the x-axis "NULL"
+       y= "n",
+       fill= "Trophic Guild")
+```
+
+[ggthemes](https://yutannihilation.github.io/allYourFigureAreBelongToUs/). Some of these are nice because they are designed to mimic the look of popular publications.
+```{r}
+#install.packages("ggthemes")
+library(ggthemes)
+```
+
+Here is a list of the `ggthemes`
+```{r}
+#ls("package:ggthemes")[grepl("theme_", ls("package:ggthemes"))]
+```
+
+```{r}
+p + 
+  theme_fivethirtyeight()+ #this is the modified line
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL,
+       y= "n",
+       fill= "Trophic Guild")
+```
+
+## Practice
+1. Use plot `q` and try the `theme_economist()` theme.  
+## RColorBrewer  
+Use a customized palette to make colors visually consistent.  
+```{r}
+?RColorBrewer
+```
+
+The thing to notice is that there are three different color palettes: 1) sequential, 2) diverging, and 3) qualitative. Within each of these there are several selections. You can bring up the colors by using `display.brewer.pal()`. Specify the number of colors that you want and the palette name.
+```{r}
+display.brewer.pal(12,"BuPu") #sequential palette ; the number corresponds to the amount of shades
+```
+**On the website 5-class and it gives you the palette name and you can put it in**
+
+The [R Color Brewer](http://colorbrewer2.org/#type=sequential&scheme=BuGn&n=3) website is very helpful for getting an idea of the color palettes. To make things easy, use these two guidelines:
+
++`scale_colour_brewer()` is for points  #geom_point
++`scale_fill_brewer()` is for fills  #because you don't fill in points 
+
+Here I chose the `Paired` palette. Take a moment and experiment with other options.
+```{r}
+p+scale_fill_brewer(palette = "Paired")+
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL,
+       y= "n",
+       fill= "Trophic Guild")
+```
+
+## Practice
+1. Keep using the `same `q` plot, but test out one of R Color Brewer palettes.  
+
+## Manually Setting Colors
+You can also use `paleteer` to build a custom palette for consistency. To access the `paleteer` collection, I add it to a new object.
+```{r}
+colors <- paletteer::palettes_d_names
+```
+
+Now we can display the palettes. Assign the palette to `my_palette` and then build this base R bar plot. There are a lot of options; `paleteer` is a collection of popular palettes. I really like the [`ggsci` package] (https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html)
+```{r}
+my_palette <- paletteer_d("ggsci::nrc_npg") #store your palette
+#remove ggsi and then add package and palettes as provided above
+#nrc is equal to package and palette is npg
+```
+
+```{r}
+barplot(rep(1,6), axes=FALSE, col=my_palette)
+```
+
+Now we just identify `my_palette` as part of `scale_fill_manual()`
+```{r}
+p+scale_fill_manual(values=my_palette)+
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 60, hjust=1))+
+  labs(title = "Observations by Taxon in Homerange Data",
+       x = NULL,
+       y= "n",
+       fill= "Trophic Guild")
+```
+
+## Practice
+1. Keep using the `same `q` plot, but test out one of `paleteer` themes.
+```{r}
+q+theme_classic()+scale_color_manual(values = my_palette)
+```
+
+## Faceting
+[Faceting](https://ggplot2-book.org/facet.html) is one of the amazing features of ggplot. It allows us to make multi-panel plots for easy comparison.  Here is a boxplot that shows the range of log10.mass by taxon.
+```{r}
+homerange %>% 
+  ggplot(aes(x=taxon, y=log10.mass))+
+  geom_boxplot()+
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+There are other categorical variables that might be interesting to overlay. `facet_wrap()` makes a ribbon of panels by a specified categorical variable and allows you to control how you want them arranged.  
+```{r}
+homerange %>% 
+  ggplot(aes(x=taxon, y=log10.mass))+
+  geom_boxplot()+
+  facet_wrap(~trophic.guild) #new ; split the plot into two automatically in columns 
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+`facet_grid()` allows control over the faceted variable; it can be arranged in rows or columns. rows~columns. 
+```{r}
+homerange %>% 
+  ggplot(aes(x=taxon, y=log10.mass))+
+  geom_boxplot()+
+  facet_grid(trophic.guild~.) #new ; ~ means across now this is all in rows  ; if put .~ at the beginning it changes
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+`facet_grid()` will also allow the comparison of two categorical variables, just remember a~b where a is rows and b is columns.  
+```{r}
+homerange %>% 
+  ggplot(aes(x=taxon, y=log10.mass))+
+  geom_boxplot()+
+  facet_grid(~trophic.guild~thermoregulation)+ #new ; split the plot into two automatically
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```

@@ -1,0 +1,213 @@
+---
+title: "Midterm 2 W24"
+author: "Liana Williams"
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    keep_md: yes
+  pdf_document: default
+---
+
+## Instructions
+Answer the following questions and complete the exercises in RMarkdown. Please embed all of your code and push your final work to your repository. Your code must be organized, clean, and run free from errors. Remember, you must remove the `#` for any included code chunks to run. Be sure to add your name to the author header above. 
+
+Your code must knit in order to be considered. If you are stuck and cannot answer a question, then comment out your code and knit the document. You may use your notes, labs, and homework to help you complete this exam. Do not use any other resources- including AI assistance.  
+
+Don't forget to answer any questions that are asked in the prompt. Some questions will require a plot, but others do not- make sure to read each question carefully.  
+
+For the questions that require a plot, make sure to have clearly labeled axes and a title. Keep your plots clean and professional-looking, but you are free to add color and other aesthetics.  
+
+Be sure to follow the directions and upload your exam on Gradescope.    
+
+## Background
+In the `data` folder, you will find data about shark incidents in California between 1950-2022. The [data](https://catalog.data.gov/dataset/shark-incident-database-california-56167) are from: State of California- Shark Incident Database.   
+
+## Load the libraries
+```{r message=FALSE, warning=FALSE}
+library("tidyverse")
+library("janitor")
+library("naniar")
+```
+
+## Load the data
+Run the following code chunk to import the data.
+```{r message=FALSE, warning=FALSE}
+sharks <- read_csv("data/SharkIncidents_1950_2022_220302.csv") %>% clean_names()
+```
+
+## Questions
+1. (1 point) Start by doing some data exploration using your preferred function(s). What is the structure of the data? Where are the missing values and how are they represented? 
+```{r}
+glimpse(sharks) #this is the structure of the data 
+```
+```{r}
+sharks #This data is in wide format! 
+```
+
+```{r}
+sharks %>% 
+  naniar::miss_var_summary() 
+```
+
+```{r}
+sharks %>% 
+  map_df(~ sum(is.na(.))) #quick summary of the number of NAs in a variable! 
+```
+The missing values in the incident_num column that show up as "NOT COUNTED." There are also missing values in time, longitude, latitude, confirmed_source, and wfl_case_number. 
+
+2. (1 point) Notice that there are some incidents identified as "NOT COUNTED". These should be removed from the data because they were either not sharks, unverified, or were provoked. It's OK to replace the `sharks` object.
+```{r}
+sharks_new <- sharks %>% 
+  filter(incident_num!="NOT COUNTED") 
+```
+
+
+3. (3 points) Are there any "hotspots" for shark incidents in California? Make a plot that shows the total number of incidents per county. Which county has the highest number of incidents?
+```{r}
+sharks_new %>% 
+  group_by(county) %>% 
+  summarize(mean_incidents=mean(incident_num, na.rm=TRUE),
+            total=n()) %>% 
+  arrange(desc(mean_incidents)) #San Diego has the most incidents 
+```
+```{r}
+sharks_new %>% 
+  ggplot(aes(x=county, y=incident_num)) + 
+  geom_col()+
+  coord_flip()
+```
+#Humboldt is the county with the most incidents 
+
+4. (3 points) Are there months of the year when incidents are more likely to occur? Make a plot that shows the total number of incidents by month. Which month has the highest number of incidents? 
+```{r}
+sharks_new %>% 
+  ggplot(aes(x=month, y=incident_num))+
+  geom_bar(stat="identity") 
+#There seems to be more incidents during the months in the middle of the year. 
+```
+
+5. (3 points) How do the number and types of injuries compare by county? Make a table (not a plot) that shows the number of injury types by county. Which county has the highest number of fatalities? 
+```{r}
+sharks_new %>% 
+  group_by(injury, county) %>% 
+  summarize(min = min(incident_num),
+            mean = mean(incident_num), 
+            max = max(incident_num))
+```
+
+
+6. (2 points) In the data, `mode` refers to a type of activity. Which activity is associated with the highest number of incidents?
+```{r}
+options(scipen=999)
+```
+
+```{r}
+sharks_new %>%
+  group_by(mode) %>% 
+  summarise(mean_incident=mean(incident_num, na.rm = T)) %>% 
+  ggplot(aes(x=reorder(mode,mean_incident), y=mean_incident))+
+  geom_col()+
+  coord_flip()+
+  scale_y_log10()
+```
+
+7. (4 points) Use faceting to make a plot that compares the number and types of injuries by activity. (hint: the x axes should be the type of injury) 
+```{r}
+sharks_new %>% 
+  mutate(incident_num=as.factor(incident_num)) %>% 
+  ggplot(aes(x=injury, y=incident_num))+
+  geom_boxplot()+
+  facet_wrap(~mode)+
+  theme(axis.text.x = element_text(angle = 60, hjust=1))
+```
+
+
+8. (1 point) Which shark species is involved in the highest number of incidents?  
+```{r}
+sharks_new %>% 
+  count(species) %>% 
+  arrange(desc(n))
+```
+The species with the highest number of incidents is White with 179. 
+
+9. (3 points) Are all incidents involving Great White's fatal? Make a plot that shows the number and types of injuries for Great White's only.
+```{r}
+sharks_new %>%
+  filter(species=="White") %>%  #Not all injuries are fatal.
+  ggplot(aes(y=incident_num, x=injury))+
+  geom_col()
+```
+
+
+## Background
+Let's learn a little bit more about Great White sharks by looking at a small dataset that tracked 20 Great White's in the Fallaron Islands. The [data](https://link.springer.com/article/10.1007/s00227-007-0739-4) are from: Weng et al. (2007) Migration and habitat of white sharks (_Carcharodon carcharias_) in the eastern Pacific Ocean.
+
+## Load the data
+```{r message=FALSE, warning=FALSE}
+white_sharks <- read_csv("data/White sharks tracked from Southeast Farallon Island, CA, USA, 1999 2004.csv", na = c("?", "n/a")) %>% clean_names()
+```
+
+10. (1 point) Start by doing some data exploration using your preferred function(s). What is the structure of the data? Where are the missing values and how are they represented?
+```{r}
+glimpse(white_sharks) #This shows the structure of the data (in wide format)
+```
+
+```{r}
+naniar::miss_var_summary(white_sharks)
+```
+```{r}
+white_sharks %>% 
+  map_df(~ sum(is.na(.))) #quick summary of the number of NAs in a variable! 
+```
+The missing values are found in sex, maturity, longitude, and latitude. 
+
+11. (3 points) How do male and female sharks compare in terms of total length? Are males or females larger on average? Do a quick search online to verify your findings. (hint: this is a table, not a plot).  
+
+```{r}
+library(gtools)
+```
+
+```{r}
+quartiles <- quantcut(white_sharks$total_length_cm)
+table(quartiles)
+```
+
+```{r}
+white_sharks %>% 
+  filter(sex!="NA") %>% 
+  mutate(length_range=case_when(total_length_cm<360 ~"very small",
+                                   total_length_cm>=400 & total_length_cm<=434 ~ "small",
+                                  total_length_cm>434 & total_length_cm<=457 ~ "medium",
+                                  total_length_cm>=530 ~ "large")) %>% 
+  ggplot(aes(x=length_range, fill=sex))+
+  geom_bar(position = "dodge", alpha=0.6, color="black")
+```
+On average Male sharks are larger!
+
+12. (3 points) Make a plot that compares the range of total length by sex.
+```{r}
+white_sharks %>% 
+  filter(!is.na(sex)) %>% 
+  ggplot(aes(x = total_length_cm, y = sex, fill=sex)) +
+  geom_boxplot()+
+    labs(title = "Total Length by Sex",
+       x= "Total_Length_cm", 
+       y="Sex")+
+  coord_flip()+
+  theme_light()
+```
+
+
+13. (2 points) Using the `sharks` or the `white_sharks` data, what is one question that you are interested in exploring? Write the question and answer it using a plot or table.  
+```{r}
+#How has incident_num changed between 1950 and 2022? There have been more incidents over time. 
+
+sharks_new %>%
+  mutate(year = as.factor(year)) %>% 
+  group_by(year) %>% 
+  ggplot(aes(x=year, fill=year))+
+  geom_bar(color="black", alpha=0.6)+
+  labs(title = "Incidents between 1950 and 2022", x = "Year", y="# Incidents")+
+  theme_light()
+```
+
