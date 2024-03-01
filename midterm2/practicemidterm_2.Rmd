@@ -95,7 +95,7 @@ surgery %>%
 5. How healthy are the participants? The variable `asa_status` is an evaluation of patient physical status prior to surgery. Lower numbers indicate fewer comorbidities (presence of two or more diseases or medical conditions in a patient). Make a plot that compares the number of `asa_status` I-II, III, and IV-V.
 ```{r}
 surgery %>% 
-  filter(asa_status!="NA") %>% 
+  filter(asa_status!="NA") %>% #remove the NAs in asa_status 
   ggplot(aes(x=asa_status, fill=asa_status))+
   geom_bar(color="black", alpha=0.6)+
   labs(title = "ASA Status of Participants", x = "ASA", y="# Participants")+
@@ -123,6 +123,7 @@ surgery %>%
   arrange(desc(ccsmort30rate)) %>% 
   slice_max(ccsmort30rate, n=5) #REVIEW SLICE
 ```
+
 ```{r}
 surgery %>% 
   group_by(ahrq_ccs) %>% 
