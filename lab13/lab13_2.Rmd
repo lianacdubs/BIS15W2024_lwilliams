@@ -154,11 +154,11 @@ bbox3 <- make_bbox(long3, lat3, f=0.3)
 
 ```{r}
 map3 <- get_stadiamap(bbox3, maptype = "stamen_terrain", zoom=7)
-#fix error 
+#fix error
 ```
 
 ```{r}
-ggmap(map3)+
+ggmap(map_3)+
   geom_point(data = sharks_fatal, aes(x=longitude, y=latitude), size=0.8)+
   labs(x="Longitude", y="Latitude", title = "Shark Fatalities Coastal California, 1950-2022")
 #fix error 
