@@ -36,14 +36,16 @@ sharks <- read_csv("data/SharkIncidents_1950_2022_220302.csv") %>% clean_names()
 ```
 
 ## Questions
-1. (1 point) Start by doing some data exploration using your preferred function(s). What is the structure of the data? Where are the missing values and how are they represented? 
+1. (1 point) Start by doing some data exploration using your preferred function(s). What is the structure of the data? Where are the missing values and how are they represented? \
+**correct answer**
 ```{r}
 glimpse(sharks) #this is the structure of the data 
 ```
+
 ```{r}
 sharks #This data is in wide format! 
 ```
-
+**correct answer**
 ```{r}
 sharks %>% 
   naniar::miss_var_summary() 
@@ -56,69 +58,154 @@ sharks %>%
 The missing values in the incident_num column that show up as "NOT COUNTED." There are also missing values in time, longitude, latitude, confirmed_source, and wfl_case_number. 
 
 2. (1 point) Notice that there are some incidents identified as "NOT COUNTED". These should be removed from the data because they were either not sharks, unverified, or were provoked. It's OK to replace the `sharks` object.
+**correct answer**
 ```{r}
 sharks_new <- sharks %>% 
   filter(incident_num!="NOT COUNTED") 
 ```
 
+```{r}
+#sharks <- sharks %>% 
+ # filter(incident_num != "NOT COUNTED")
+```
 
+```{r}
+#sharks_test %>% 
+ # filter(!incident_num=="NOT COUNTED")
+```
 3. (3 points) Are there any "hotspots" for shark incidents in California? Make a plot that shows the total number of incidents per county. Which county has the highest number of incidents?
+**correct answer**
+_San Diego County has the highest number of incidents._
+
 ```{r}
-sharks_new %>% 
-  group_by(county) %>% 
-  summarize(mean_incidents=mean(incident_num, na.rm=TRUE),
-            total=n()) %>% 
-  arrange(desc(mean_incidents)) #San Diego has the most incidents 
+sharks %>% 
+  group_by(county) %>%
+  summarise(n = n()) %>%
+  ggplot(aes(x=reorder(county, n), y=n)) +
+  geom_col(fill = "#0099f9", alpha=0.8)+
+  labs(title="Shark Incidents by County (1950-2022)", 
+       x=NULL, 
+       y="n") +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1),
+        plot.title = element_text(size = 14, face="bold"))+
+  geom_text(aes(label = n), vjust = -0.2, size = 3, color = "black") #this is how to get the numbers on the bars 
 ```
+
 ```{r}
-sharks_new %>% 
-  ggplot(aes(x=county, y=incident_num)) + 
-  geom_col()+
-  coord_flip()
+sharks %>% 
+  count(county) %>% 
+  arrange(desc(n))
 ```
-#Humboldt is the county with the most incidents 
+
+```{r}
+#sharks_new %>% 
+ # group_by(county) %>% 
+ # summarize(mean_incidents=mean(incident_num, na.rm=TRUE),
+           # total=n()) %>% 
+ # arrange(desc(mean_incidents)) #San Diego has the most incidents 
+```
+
+```{r}
+#sharks_new %>% 
+ # ggplot(aes(x=county, y=incident_num)) + 
+#  geom_col()+
+#  coord_flip()
+```
+
 
 4. (3 points) Are there months of the year when incidents are more likely to occur? Make a plot that shows the total number of incidents by month. Which month has the highest number of incidents? 
+**correct answer**
+_October_
 ```{r}
-sharks_new %>% 
-  ggplot(aes(x=month, y=incident_num))+
-  geom_bar(stat="identity") 
+sharks %>% 
+  group_by(month) %>%
+  summarise(total=n(), .groups='keep') %>% 
+  ggplot(aes(x=as_factor(month), y=total))+
+  geom_col(fill = "#0099f9", alpha=0.8)+
+  labs(title="Shark Incidents by Month", 
+       x="Month", 
+       y="n")+
+  theme(plot.title = element_text(size = 14, face="bold"))
+```
+
+```{r}
+#sharks_new %>% 
+  #ggplot(aes(x=month, y=incident_num))+
+  #geom_bar(stat="identity") 
 #There seems to be more incidents during the months in the middle of the year. 
 ```
 
 5. (3 points) How do the number and types of injuries compare by county? Make a table (not a plot) that shows the number of injury types by county. Which county has the highest number of fatalities? 
+**correct answer**
+_San Luis Obispo_
 ```{r}
-sharks_new %>% 
-  group_by(injury, county) %>% 
-  summarize(min = min(incident_num),
-            mean = mean(incident_num), 
-            max = max(incident_num))
+sharks %>% 
+  tabyl(county, injury) %>% #could have just done these first two lines
+  adorn_totals("col") %>% 
+  arrange(desc(fatal)) %>% 
+  as_tibble() #makes it into a data table
+```
+
+```{r}
+sharks %>% 
+  group_by(county, injury) %>%
+  summarise(total=n(), .groups='keep') %>% 
+  pivot_wider(names_from = injury, values_from = total) %>% 
+  mutate(total=sum(minor, major, fatal, none, na.rm=T)) %>% 
+  arrange(desc(fatal))
+```
+
+```{r}
+#sharks_new %>% 
+ # group_by(injury, county) %>% 
+ # summarize(min = min(incident_num),
+          #  mean = mean(incident_num), 
+         #   max = max(incident_num))
 ```
 
 
 6. (2 points) In the data, `mode` refers to a type of activity. Which activity is associated with the highest number of incidents?
+**correct answer**
 ```{r}
-options(scipen=999)
+sharks %>% 
+  count(mode) %>% 
+  arrange(desc(n))
 ```
 
 ```{r}
-sharks_new %>%
-  group_by(mode) %>% 
-  summarise(mean_incident=mean(incident_num, na.rm = T)) %>% 
-  ggplot(aes(x=reorder(mode,mean_incident), y=mean_incident))+
-  geom_col()+
-  coord_flip()+
-  scale_y_log10()
+#options(scipen=999)
+```
+
+```{r}
+#group_by(mode) %>% 
+ # summarise(mean_incident=mean(incident_num, na.rm = T)) %>% 
+ # ggplot(aes(x=reorder(mode,mean_incident), y=mean_incident))+
+ # geom_col()+
+ # coord_flip()+
+ # scale_y_log10()
 ```
 
 7. (4 points) Use faceting to make a plot that compares the number and types of injuries by activity. (hint: the x axes should be the type of injury) 
+**correct answer**
 ```{r}
-sharks_new %>% 
-  mutate(incident_num=as.factor(incident_num)) %>% 
-  ggplot(aes(x=injury, y=incident_num))+
-  geom_boxplot()+
+sharks %>% 
+  ggplot(aes(x=injury, fill=injury))+
+  geom_bar(alpha=0.8, position="dodge")+
   facet_wrap(~mode)+
-  theme(axis.text.x = element_text(angle = 60, hjust=1))
+  labs(title="Injury Type by Activity", 
+       x=NULL, 
+       y="Number of Incidents")+
+  theme(strip.text = element_text(size=10),
+        axis.text.x = element_text(size=8, angle = 60, hjust = 1))
+```
+
+```{r}
+#sharks_new %>% 
+ # mutate(incident_num=as.factor(incident_num)) %>% 
+ # ggplot(aes(x=injury, y=incident_num))+
+ # geom_boxplot()+
+ # facet_wrap(~mode)+
+ # theme(axis.text.x = element_text(angle = 60, hjust=1))
 ```
 
 
@@ -130,12 +217,32 @@ sharks_new %>%
 ```
 The species with the highest number of incidents is White with 179. 
 
-9. (3 points) Are all incidents involving Great White's fatal? Make a plot that shows the number and types of injuries for Great White's only.
+**correct answer**
+_Great White_
 ```{r}
-sharks_new %>%
-  filter(species=="White") %>%  #Not all injuries are fatal.
-  ggplot(aes(y=incident_num, x=injury))+
-  geom_col()
+sharks %>% 
+  count(species) %>% 
+  arrange(desc(n))
+```
+9. (3 points) Are all incidents involving Great White's fatal? Make a plot that shows the number and types of injuries for Great White's only.
+_No, the largest number of incidents have no injury_
+```{r}
+sharks %>% 
+  filter(species=="White") %>% 
+  ggplot(aes(x=injury))+
+  geom_bar(fill = "#0099f9", alpha=0.8)+
+  labs(title="Incidents Involving Great White Sharks", 
+       x="Injury", 
+       y="n")+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1),
+        plot.title = element_text(size = 14, face="bold"))
+```
+
+```{r}
+#sharks_new %>%
+ # filter(species=="White") %>%  #Not all injuries are fatal.
+  #ggplot(aes(y=incident_num, x=injury))+
+  #geom_col()
 ```
 
 
@@ -148,13 +255,15 @@ white_sharks <- read_csv("data/White sharks tracked from Southeast Farallon Isla
 ```
 
 10. (1 point) Start by doing some data exploration using your preferred function(s). What is the structure of the data? Where are the missing values and how are they represented?
+**correct answer**
 ```{r}
 glimpse(white_sharks) #This shows the structure of the data (in wide format)
 ```
-
+**correct answer**
 ```{r}
 naniar::miss_var_summary(white_sharks)
 ```
+
 ```{r}
 white_sharks %>% 
   map_df(~ sum(is.na(.))) #quick summary of the number of NAs in a variable! 
@@ -162,52 +271,85 @@ white_sharks %>%
 The missing values are found in sex, maturity, longitude, and latitude. 
 
 11. (3 points) How do male and female sharks compare in terms of total length? Are males or females larger on average? Do a quick search online to verify your findings. (hint: this is a table, not a plot).  
-
+**correct answer**
 ```{r}
-library(gtools)
+white_sharks %>%
+  filter(sex!="NA") %>% 
+  group_by(sex) %>% 
+  summarise(mean_length=mean(total_length_cm, na.rm=T),
+            n=n(), .groups='keep')
 ```
 
 ```{r}
-quartiles <- quantcut(white_sharks$total_length_cm)
-table(quartiles)
+#library(gtools)
 ```
 
+```{r}
+#quartiles <- quantcut(white_sharks$total_length_cm)
+#table(quartiles)
+```
+
+```{r}
+#white_sharks %>% 
+ # filter(sex!="NA") %>% 
+ # mutate(length_range=case_when(total_length_cm<360 ~"very small",
+         #                          total_length_cm>=400 & #total_length_cm<=434 ~ "small",
+          #                        total_length_cm>434 & total_length_cm<=457 ~ "medium",
+#                                  total_length_cm>=530 ~ "large")) %>% 
+#  ggplot(aes(x=length_range, fill=sex))+
+ # geom_bar(position = "dodge", alpha=0.6, color="black")
+```
+
+
+12. (3 points) Make a plot that compares the range of total length by sex.
+**correct answer**
 ```{r}
 white_sharks %>% 
   filter(sex!="NA") %>% 
-  mutate(length_range=case_when(total_length_cm<360 ~"very small",
-                                   total_length_cm>=400 & total_length_cm<=434 ~ "small",
-                                  total_length_cm>434 & total_length_cm<=457 ~ "medium",
-                                  total_length_cm>=530 ~ "large")) %>% 
-  ggplot(aes(x=length_range, fill=sex))+
-  geom_bar(position = "dodge", alpha=0.6, color="black")
+  ggplot(aes(x=sex, y=total_length_cm, fill=sex))+
+  geom_boxplot(alpha=0.8)+
+  labs(title="Length of Great White Sharks by Sex", 
+       x="Sex", 
+       y="Total Length (cm)")
 ```
-On average Male sharks are larger!
 
-12. (3 points) Make a plot that compares the range of total length by sex.
 ```{r}
-white_sharks %>% 
-  filter(!is.na(sex)) %>% 
-  ggplot(aes(x = total_length_cm, y = sex, fill=sex)) +
-  geom_boxplot()+
-    labs(title = "Total Length by Sex",
-       x= "Total_Length_cm", 
-       y="Sex")+
-  coord_flip()+
-  theme_light()
+#white_sharks %>% 
+#  filter(!is.na(sex)) %>% 
+#  ggplot(aes(x = total_length_cm, y = sex, fill=sex)) +
+#  geom_boxplot()+
+#    labs(title = "Total Length by Sex",
+ ##      y="Sex")+
+ # coord_flip()+
+ # theme_light()
 ```
 
 
 13. (2 points) Using the `sharks` or the `white_sharks` data, what is one question that you are interested in exploring? Write the question and answer it using a plot or table.  
+**correct answer**
+_What is the distribution of total length by sex?_
+```{r}
+white_sharks %>%
+  filter(sex!="NA") %>% 
+  ggplot(aes(x=total_length_cm))+
+  geom_density(fill = "#0099f9", alpha=0.8)+
+  facet_wrap(~sex)+
+  labs(title="Distribution of Total Length by Sex", 
+       x="Total Length (cm)", 
+       y=NULL)+
+  theme(strip.text = element_text(size=10),
+        axis.text.x = element_text(size=8, angle = 60, hjust = 1))
+```
+
 ```{r}
 #How has incident_num changed between 1950 and 2022? There have been more incidents over time. 
 
-sharks_new %>%
-  mutate(year = as.factor(year)) %>% 
-  group_by(year) %>% 
-  ggplot(aes(x=year, fill=year))+
-  geom_bar(color="black", alpha=0.6)+
-  labs(title = "Incidents between 1950 and 2022", x = "Year", y="# Incidents")+
-  theme_light()
+#sharks_new %>%
+#  mutate(year = as.factor(year)) %>% 
+ # group_by(year) %>% 
+ # ggplot(aes(x=year, fill=year))+
+ # geom_bar(color="black", alpha=0.6)+
+ # labs(title = "Incidents between 1950 and 2022", x = "Year", y="# Incidents")+
+ # theme_light()
 ```
 
