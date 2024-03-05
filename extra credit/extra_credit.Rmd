@@ -89,47 +89,99 @@ global_sharks_new %>%
 ```
 
 4. (3 points) Which activity is associated with the highest number of incidents? Make a plot that compares the top 5 riskiest activities. "NA" should not be classified as an activity.
+#Check the total for each activity
 ```{r}
 global_sharks_new %>% 
   count(activity) %>% 
   arrange(desc(n))
 ```
-**fix this**
-```{r}
-global_sharks_new %>% 
-  filter(activity!="NA") %>% 
-  top_n(5, n) #%>% 
- # ggplot(aes(x=common.name, y=log10.mass))+
- # geom_col()+ #use when you have x and y axis
- # coord_flip()
-```
 
+```{r}
+global_sharks %>% 
+  filter(activity!="NA") %>% 
+  group_by(activity) %>% 
+  summarise(incident_count = n()) %>% 
+  top_n(5, incident_count) %>% 
+  ggplot(aes(x=reorder(activity, incident_count),  y=incident_count))+
+  geom_col()+ 
+  coord_flip() + 
+  labs(x = "Activity", y = "Number of Incidents", title = "Top 5 Riskiest Activities")
+```
 
 5. (3 points) The data include information on who was attacked. Make a plot that shows the total number of fatalities by sex- are males or females more likely to be killed by sharks?
 
-**fix this**
 ```{r}
 global_sharks %>%
-  filter(sex!="NA") %>% 
-  ggplot(aes(x=sex, y=fatal_y_n, fill=sex))+
-  geom_boxplot(alpha=0.8)+
+  filter(sex %in% c("M", "F")) %>% 
+  group_by(sex) %>% 
+  summarise(fatalities = sum(fatal_y_n == "Y", na.rm = T)) %>% 
+  ggplot(aes(x=sex, y=fatalities, fill=sex))+
+  geom_col(alpha=0.8)+
   labs(title="Fatalities from Sharks by Sex", 
        x="Sex", 
        y="Fatality")
 ```
 
-
-
 6. (3 points) Make a plot that shows the range of age for the individuals that are attacked. Make sure to restrict sex to M or F (some of the codes used are not clear). You will also need to find a way to manage the messy age column.
+**fix this**
+```{r}
+global_sharks_new %>% 
+  filter(sex!="NA") %>% 
+  ggplot(aes(x=sex, y=activity, fill=sex))+
+  geom_boxplot(alpha=0.8)+
+  labs(title="Age of Attacked Individuals", 
+       x="Attacks", 
+       y="Age")
+```
+
 
 
 7. (3 points) In the United States, what are the top 5 states where shark attacks have been recorded since 1950? Make a plot that compares the number of incidents for these 5 states.
+```{r}
+
+```
+
+
 
 
 8. (3 points) Make a new object that limits the data to only include attacks attributed to Great White Sharks. This is trickier than it sounds, you should end up with 494 observations. Look online and adapt code involving `str_detect`. Which country has the highest number of Great White Shark attacks?
+```{r}
+
+```
+
 
 
 9. (4 points) Use faceting to compare the number of fatal and non-fatal attacks for the top 5 countries with the highest number of Great White Shark attacks.
 
+**fix this**
+```{r}
+global_sharks_new %>% 
+  ggplot(aes(x=injury, fill=injury))+
+  geom_bar(alpha=0.8, position = "dodge")+
+  facet_wrap(~activity)+
+ labs(title="Injury Type by Activity", 
+       x=NULL, 
+       y="Number of Incidents")+
+  theme(strip.text = element_text(size=10),
+        axis.text.x = element_text(size=8, angle = 60, hjust = 1))
+```
+
+
 
 10. (3 points) Using the `global_sharks` data, what is one question that you are interested in exploring? Write the question and answer it using a plot or table. 
+
+**fix this**
+Are there more Male or Female surfing shark attacks? Make a bar plot that shows their relative numbers.
+```{r}
+global_sharks %>% 
+  select(activity, sex) %>% 
+  filter(activity=="Surfing") %>% 
+  filter(sex!="NA" & sex!="lli") %>% 
+  ggplot(aes(sex))+
+  geom_bar()+
+  labs(title="Shark Sex vs. Surfing Attacks", 
+       x="Sex", 
+       y="Number of Surfing Attacks")
+```
+
+
