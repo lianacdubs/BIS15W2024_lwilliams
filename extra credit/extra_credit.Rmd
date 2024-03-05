@@ -135,20 +135,16 @@ global_sharks_new %>%
 ```
 
 
-
 7. (3 points) In the United States, what are the top 5 states where shark attacks have been recorded since 1950? Make a plot that compares the number of incidents for these 5 states.
 ```{r}
 
 ```
 
 
-
-
 8. (3 points) Make a new object that limits the data to only include attacks attributed to Great White Sharks. This is trickier than it sounds, you should end up with 494 observations. Look online and adapt code involving `str_detect`. Which country has the highest number of Great White Shark attacks?
 ```{r}
 
 ```
-
 
 
 9. (4 points) Use faceting to compare the number of fatal and non-fatal attacks for the top 5 countries with the highest number of Great White Shark attacks.
@@ -165,7 +161,6 @@ global_sharks_new %>%
   theme(strip.text = element_text(size=10),
         axis.text.x = element_text(size=8, angle = 60, hjust = 1))
 ```
-
 
 
 10. (3 points) Using the `global_sharks` data, what is one question that you are interested in exploring? Write the question and answer it using a plot or table. 
