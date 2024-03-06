@@ -145,10 +145,6 @@ ggplot(sharks_cleaned, aes(x = sex, y = age)) +
   theme_minimal()
 ```
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 02575f71503055cd979541db63fb0a9b974466d5
 7. (3 points) In the United States, what are the top 5 states where shark attacks have been recorded since 1950? Make a plot that compares the number of incidents for these 5 states.
 ```{r}
 shark_attack <- global_sharks %>% 
@@ -163,16 +159,12 @@ state_incidents <- shark_attack %>%
   top_n(5, incidents)
 ```
 
-<<<<<<< HEAD
 ```{r}
 ggplot(state_incidents, aes(x = reorder(area, incidents), y = incidents)) +
   geom_bar(stat = "identity") +
   labs(x = "State", y = "Number of Incidents", title = "Top 5 States by Shark Attacks Since 1950") +
   coord_flip()
 ```
-
-=======
->>>>>>> 02575f71503055cd979541db63fb0a9b974466d5
 8. (3 points) Make a new object that limits the data to only include attacks attributed to Great White Sharks. This is trickier than it sounds, you should end up with 494 observations. Look online and adapt code involving `str_detect`. Which country has the highest number of Great White Shark attacks?
 
 ```{r}
@@ -226,10 +218,6 @@ ggplot(top_country_attacks, aes(x = country, fill = fatal_y_n)) +
         axis.text.x = element_text(size=8, angle = 60, hjust = 1))
 ```
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 02575f71503055cd979541db63fb0a9b974466d5
 10. (3 points) Using the `global_sharks` data, what is one question that you are interested in exploring? Write the question and answer it using a plot or table. 
 
 Are there more Male or Female surfing shark attacks? Make a bar plot that shows their relative numbers.
