@@ -23,21 +23,106 @@ Make sure to use the formatting conventions of RMarkdown to make your report nea
 library(tidyverse)
 library(shiny)
 library(shinydashboard)
+library(naniar)
+library(janitor)
 ```
 
 ## Data
 The data for this assignment come from the [University of California Information Center](https://www.universityofcalifornia.edu/infocenter). Admissions data were collected for the years 2010-2019 for each UC campus. Admissions are broken down into three categories: applications, admits, and enrollees. The number of individuals in each category are presented by demographic.  
 ```{r}
-UC_admit <- read_csv("data/UC_admit.csv")
+UC_admit <- read_csv("data/UC_admit.csv") %>% clean_names()
 ```
 
 **1. Use the function(s) of your choice to get an idea of the overall structure of the data frame, including its dimensions, column names, variable classes, etc. As part of this, determine if there are NA's and how they are treated.**  
-
+```{r}
+glimpse(UC_admit)
+```
+```{r}
+names(UC_admit)
+```
+```{r}
+dim(UC_admit)
+```
+```{r}
+miss_var_summary(UC_admit)
+```
 
 **2. The president of UC has asked you to build a shiny app that shows admissions by ethnicity across all UC campuses. Your app should allow users to explore year, campus, and admit category as interactive variables. Use shiny dashboard and try to incorporate the aesthetics you have learned in ggplot to make the app neat and clean.**  
+```{r}
+UC_admit %>% 
+  ggplot(aes(x=ethnicity))+
+  geom_bar()
+```
 
+```{r}
+library(shiny)
+
+ui <- dashboardPage(
+  dashboardHeader(title = "UC Admissions"), 
+  dashboardSidebar(disable = T), 
+  dashboardBody(
+    fluidRow(
+      box(width = 3, 
+      selectInput("x", "UC Campus", unique(UC_admit$campus)), hr()), 
+      box(width = 3, 
+      selectInput("y", "Year", unique(UC_admit$academic_yr)), hr()),
+      box(width = 7,
+      plotOutput("plot", width = "600px", height = "400px"))))
+)
+
+server <- function(input, output, session){
+  session$onSessionEnded(stopApp)
+  
+  output$plot <- renderPlot({
+    
+    UC_admit %>% 
+    filter(category=="Admits") %>% 
+    group_by(academic_yr) %>% 
+    ggplot(aes(x=ethnicity, y=filtered_count_fr))+
+    geom_col()
+    
+  })}
+
+shinyApp(ui, server)
+```
+
+shinyApp(ui, server)
 
 **3. Make alternate version of your app above by tracking enrollment at a campus over all of the represented years while allowing users to interact with campus, category, and ethnicity.**
+```{r}
+library(shiny)
+
+ui <- dashboardPage(
+  dashboardHeader(title="UC Admissions"),
+  dashboardSidebar(disable = T),
+  dashboardBody(
+     fluidRow(
+      box(width=3,
+      selectInput("x", "UC Campus", unique(UC_admit$campus)), hr()),
+      box(width=3,
+      selectInput("y", "Ethnicity", unique(UC_admit$Ethnicity)), hr()),
+      box(width=3,
+      selectInput("z", "Year", unique(UC_admit$academic_yr)), hr()),
+      box(width = 8,
+      plotOutput("plot", width = "600px", height = "400px")))))
+
+
+server <- function(input, output, session) {
+  session$onSessionEnded(stopApp)
+  
+  output$plot <- renderPlot({
+    
+  UC_admit %>% 
+  filter(category=="Admits") %>% 
+  group_by(academic_yr) %>% 
+  ggplot(aes(x=ethnicity, y=filtered_count_fr))+
+  geom_col()
+  
+})}
+
+
+shinyApp(ui, server)
+```
 
 
 ## Push your final code to GitHub!
