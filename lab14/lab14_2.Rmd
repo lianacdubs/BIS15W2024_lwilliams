@@ -139,28 +139,16 @@ shinyApp(ui, server)
 Let's add our ui and server elements to make a functional dashboard. We will put our ui elements in the `dashboardBody()`. Edit your app script to use the dashboard format. We won't do anything with the sidebar in this tutorial, but see the [R Studio tutorial](https://rstudio.github.io/shinydashboard/get_started.html) for more information.  
 
 Let's go back to our original app that produced a scatterplot for the penguins data.
-**FIX THIS**
+
 
 ```{r}
 
-ui <- dashboardPage(
-  
-  dashboardHeader(title = "Penguins"),
-  
-  dashboardSidebar(disable = T), #turns off sidebar 
-  
-  dashboardBody(
-    fluidRow(
-    box(
-
+ui <- fluidPage(
     selectInput("x", "Select X Variable", choices = c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"),
               selected = "bill_length_mm"),
-    
     selectInput("y", "Select Y Variable", choices = c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"),
               selected = "bill_depth_mm"),
-) #This closes the first box 
     sliderInput("pointsize", "Select the Point Size", min = 0.5, max = 3, value = 1, step = 0.5),
-    
     plotOutput("plot", width = "500px", height = "400px")
 )
 
@@ -178,14 +166,26 @@ shinyApp(ui, server)
 
 Now let's add our server functions... 
 ```{r}
-
 ui <- dashboardPage(
-  dashboardHeader(title = "Penguins"),
+  dashboardHeader(title="Penguins"),
   dashboardSidebar(disable = T),
-  dashboardBody()
+  dashboardBody(
+    selectInput("x", "Select X Variable", choices = c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"),
+              selected = "bill_length_mm"),
+    selectInput("y", "Select Y Variable", choices = c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"),
+              selected = "bill_depth_mm"),
+    sliderInput("pointsize", "Select the Point Size", min = 0.5, max = 3, value = 1, step = 0.5),
+    plotOutput("plot", width = "500px", height = "400px")
+  )
 )
 
-server <- function(input, output) { }
+server <- function(input, output, session) {
+  output$plot <- renderPlot({
+  ggplot(penguins, aes_string(x = input$x, y = input$y, color="species")) + 
+      geom_point(size=input$pointsize) + 
+      theme_light()
+    })
+}
 
 shinyApp(ui, server)
 ```
@@ -289,41 +289,37 @@ wolves %>%
   facet_wrap(~pop)
 ```
 
-**FIX THIS** 
+
 ```{r}
 ui <- dashboardPage(
-  dashboardHeader(title = "Sec Composition by Wolf Population"),
-  
+  dashboardHeader(title="Sex Composition by Wolve Population"),
   dashboardSidebar(disable = T),
-  
   dashboardBody(
     fluidRow(
-      box(width = 3, #controls box width 
-      selectInput("x", "Select Population", choices = unique(wolves$pop)), hr() #gives some help with multiple observations 
-          
-          ), #closes first box 
-      
-      box(width = 7, 
+      box(width=3,
+      selectInput("x", "Select Population", choices = unique(wolves$pop)), hr()),
+      box(width = 7,
       plotOutput("plot", width = "600px", height = "400px")
-      
-) #closes the second box 
-) #closes the row 
-) #closes the dashboard body
-) #closes the ui
+)
+)
+)
+)
 
 server <- function(input, output, session) { 
-
-  session$onSessionEnded(stopApp) #automatically stop the app when we close it
+  
+  session$onSessionEnded(stopApp)
   
   output$plot <- renderPlot({
   wolves %>% 
-      filter(sex!="NA") %>% 
-      filter(pop==input$x) %>% #filter is the reactive part 
+     filter(sex!="NA") %>% 
+      filter(pop==input$x) %>% 
       ggplot(aes(x=sex, fill=sex))+
       geom_bar()
     })
 }
 
+
+  
 shinyApp(ui, server)
 ```
 
