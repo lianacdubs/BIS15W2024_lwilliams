@@ -26,12 +26,12 @@ library(dplyr)
 
 1.
 ```{r}
-blood_count <- read_csv("data/blood_count.csv")
+blood_count <- read_csv("data/blood_count.csv") #the name is wrong
 ```
 
 2. 
 ```{r}
-glmpse(blood_count)
+glmpse(blood_count) #glimpse is spelled wrong
 
 ```
 
