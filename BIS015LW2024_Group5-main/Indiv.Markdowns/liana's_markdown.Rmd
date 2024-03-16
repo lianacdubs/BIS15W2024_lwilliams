@@ -1,0 +1,341 @@
+---
+title: "Fish Data Liana"
+author: "Liana Williams"
+date: "2024-02-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Load the Libraries 
+```{r}
+library(tidyverse)
+library(janitor)
+library(skimr)
+library(naniar)
+library(visdat)
+library(RColorBrewer)
+library(paletteer)
+install.packages("ggmap")
+library(ggmap)
+```
+
+```{r}
+getwd()
+```
+**IDEAS** 
+-We can make the ReadMe look very nice! 
+-Might need to do formula conversion to km for distance!
+
+#Endurance 
+[endurance](https://www.bco-dmo.org/dataset/739171)
+```{r}
+endurance <- read_csv("/Users/liana/Desktop/BIS15/BIS15W2024_lwilliams/GroupPresentation/BIS_015L_Project/data/endurance.csv") %>% clean_names()
+```
+
+
+##Purpose of the Paper (Endurance Dataset)
+
+# Introduction
+
+Summarizes key findings from a study on the ontogeny of swimming endurance in larval reef fish and its implications for dispersal patterns.
+
+# Ontogeny of Swimming Endurance
+
+## Swimming Endurance Development
+- Swimming endurance in larval reef fish remains low (< 5 km) until reaching 9–10 mm in size.
+- Late-stage larvae of various reef fish families can swim for long durations, exceeding 20 km in swimming flumes.
+- Swimming duration increases significantly with age in the studied species (Amphiprion percula (**clownfish**), Elacatinus lori, and E. colini).
+- A. percula larvae, in particular, exhibit remarkable endurance, with the best-performing larva covering 64.1 km over 10.5 days.
+
+## Effect of Flow Velocity on Swimming Durations
+- Swimming durations decrease with increasing flow velocity.
+- Durations improve when larval swimming speed exceeds experimental flow velocity.
+- Late-stage A. percula maintains consistent swimming durations across a range of flow velocities from 2 to 10 cm/s.
+
+# Swimming Abilities and Dispersal
+
+## Modal Dispersal Distance
+- Despite trait differences, modal dispersal distance for each species occurs within 0–1 km of their natal origin.
+- Traits like strong swimming abilities and short Pelagic Larval Duration (PLD) don't necessarily correlate with retaining larvae near their natal reef.
+- Maximum swimming speed and mean body size are better predictors of dispersal distances than PLD.
+  
+## Relationship between Swimming Speed and Long-Distance Dispersal (LDD)
+- Strong swimming abilities could facilitate LDD from both the larva's and parent's perspectives.
+- Larvae with strong swimming abilities may search farther for suitable settlement habitat, while parents benefit from larvae being displaced farther without being lost to advection.
+
+# Data Availability
+- The datasets generated during the study are available in the [BCO-DMO repository](https://www.bco-dmo.org/dataset/739171) and [here](https://www.bco-dmo.org/dataset/739149) (Buston and Majoris 2018a, b).
+
+# Conclusion
+This study suggests a correlation between larval swimming abilities and long-distance dispersal in reef fish. It challenges prevailing ideas about the role of specific traits in larval dispersal and emphasizes the importance of swimming abilities in understanding population connectivity for marine conservation strategies.
+
+
+##Scientific Definitions 
+**Ontogeny** - the origination and development of an organism (both physical and psychological, e.g., moral development), usually from the time of fertilization of the egg to adult.  
+
+[ontogeny](https://en.wikipedia.org/wiki/Ontogeny#:~:text=Ontogeny%20(also%20ontogenesis)%20is%20the,entirety%20of%20an%20organism's%20lifespan.)
+
+**Swimming Pool Flume** - is a smaller, compact, counter-current pool in which the swimmer must work against to maintain position.
+
+[pool flume](https://www.swimmingworldmagazine.com/news/endless-pools-an-alternative-to-improve-swimming-performance/#:~:text=A%20swimming%20pool%20flume%20is,work%20against%20to%20maintain%20position.)
+
+
+
+##Variables (This is found in the "parameters" section on the website)
+
+
+| Supplied Name | Supplied Description                                         | Supplied Units                | Standard Name     |
+|---------------|--------------------------------------------------------------|-------------------------------|-------------------|
+| **date**          | Date of swim trial; yyyy/mm/dd                              | unitless                      | date              |
+| **location**      | Indicates whether trials were completed in the lab or field | unitless                      | site              |
+| **species**       | Reef fish species                                           | unitless                      | species           |
+| **batch_id **     | Unique label indicating clutch or batch identity             |  unitless                      | sample_descrip    |
+|**dph**         | Age in days post hatch                                       | days post hatch               | days              |
+| **stand_dph**     | A larva's age/expected age at settlement for each species   | percent                       | age               |
+| **speed**         | Flow rate during the trial                                   | centimeters per second        | no_bcodmo_term    |
+| **time_sec**      | A larva's swimming duration in seconds                      | seconds                       | duration          |
+| **dist_cm**       | Equivalent distance a larva swam                             | centimeters                   | transect          |
+| **TL**            | Total length                                                | millimeters                   | no_bcodmo_term    |
+| **SL**            | Standard length                                             | millimeters                   | no_bcodmo_term    |
+| **BD**            | Body depth                                                  | millimeters                   | width             |
+| **PA**            | Propulsive area                                             | millimeters                   | transect          |
+
+
+#Information on Dory (Paracanthurus hepatus) and Marlin (Amphiprion percula)
+
+The Great Barrier Reef is part of a larger system of ocean circulation in the Pacific Ocean. 
+
+[aquarium of the pacific](https://www.aquariumofpacific.org/onlinelearningcenter/species/palette_surgeonfish)
+-The Paracanthurus hepatus is a platte surgeonfish known as a regal blue tang, and blue tang. 
+-weapons like spines at the base of its tail.
+
+**LOCATION: Indo-Pacific Ocean **from East Africa to Kiribati, north to southern Japan, south to the southern Great Barrier Reef, Samoa and New Caledonia.
+
+((((((--THIS IS SEEN IN THE MAPS SECTION--))))))
+
+**HABITAT: Coral Reefs with strong water currents**
+
+**LONGEVITY: 12-14 but up to 30 yrs**
+
+**Size**
+Palette surgeonfish range from 5 to 15 inches (12 to 38 centimeters) in length, averaging 10 to 12 inches (25 to 31 centimeters).
+
+**REPRODUCTION**
+Breeding takes place during the cooler months, depending on location and water temperature. Breeding activity is most concentrated from December to June in the Pacific. 
+
+(((((--USE THIS TO EXPLAIN WHY DORY AND MARLIN ARE NOT FOUND IN THE SAME LOCATION ON THE MAP)))))
+
+[clownfishdiversity](https://animaldiversity.org/accounts/Amphiprion_percula/)
+
+# Amphiprion percula (clownfish)
+**LOCATION:** True clown anemonefishes (Amphiprion percula) are native only to the Indo-Pacific Region (Rosenberg and Cruz, 1988). The species ranges from Northern Queensland to Melanesia, which comprises New Guinea, New Britain, New Ireland, the Solomon Islands, and Vanuatu (Fautin and Allen, 1992)
+
+**HABITAT:**
+Form symbiotic relationships with sea anemones. 
+Habitat Regions: tropical saltwater or marine
+Aquatic Biomes: reef; coastal
+Range depth
+1 to 12 m
+3.28 to 39.37 ft
+
+**PHYSICAL DESCRIPTION**
+A. percula can grow to 110 mm in length and is often distinguished by three white vertical bars on a bright orange body
+
+**REPRODUCTION**
+A. percula can breed/spawn year round due to the perpetually warm tropical waters they inhabit.
+
+**LONGEVITY** data is limited but, avergae for the wold is 6-10 years.
+
+[barrierreef.org](https://www.barrierreef.org/the-reef/animals/clownfish#:~:text=Clownfish%20survive%20in%20a%20mutually,the%20anemone's%20poison%20and%20eaten.)
+-Clownfish survive in a mutually assistive symbiotic relationship with anemone. The anemone protect the clownfish from predators and provide food scraps. The clownfish in turn, clean the anemone's poison and eat the anemone's dead tentacles.Their bright colors are used to lure fish into the anemone's tentacles.
+
+##facts of clownfish 
+-clownfish eggs can be hatched anytime during the year. 
+-after the clownfish eggs are laid, the male clownfish guard them until they hatch. 
+-Clownfish are all born males. Once they become female, they cannot be male again. 
+-Not yet known how clownfish survive the anemone's poison. 
+-Male clownfish are the primary caretakers for their young, with females only helping on occasion. 
+
+**REPRODUCTION**
+-If the female of the group dies, the dominant male fish will turn permanently female and the largest of the smaller males will become the next dominant male.
+-Female clownfish can lay thousands of eggs. After they are laid, the male will fertilise them. Any damaged or infertile eggs are typically eaten by the male.  
+
+
+------------------------------------------------------------------------------------------------------------------
+**DON'T USE CLOWNFISH DATA IT IS UNORGANIZED AND ALL CATEGORICAL**
+
+#Clownfish Dataset 
+[clownfish](https://www.bco-dmo.org/dataset/526852) 
+
+```{r}
+clownfish <- read_csv("/Users/liana/Desktop/BIS15/BIS15W2024_lwilliams/GroupPresentation/BIS_015L_Project/data/clownfish_log.csv") %>%  clean_names()
+```
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+**Liana - maps**
+
+Load the data for longitude and latitude of clownfish and blue tang
+```{r}
+long_lat <- read_csv("data/long_lat_fishes.csv") %>% clean_names()
+```
+#Scatterplot of the longitude and latitude of clownfish and blue tang
+```{r}
+#Make a scatterplot of the clownfish and blue tang
+long_lat %>%
+  ggplot(aes(x = longitude, y = latitude, color = species)) +
+  geom_point() +
+  theme_minimal() +
+  scale_color_manual(values = c("orange", "blue")) + #make the colors the same as Marlin and Dory so, the colors are consistent. 
+  labs(title = "Longitude and Latitude of Clownfish and Blue Tang")
+```
+
+
+#Our goal here is to plot the Amphirion Percula (clownfish) and Paracanthurus hepatus (blue tang) locations from the columns which contain the latitude and longitude.
+
+Load a map from `stamen` in a terrain style projection and display the map. 
+```{r}
+register_stadiamaps("ae9b303b-2453-44b9-8f34-55a7a872cf5c", write = FALSE)
+```
+
+We set the bounding box to a little outside our min and max locations with `f = 0.05`.    This is so that the points are not right on the edge of the map. 
+```{r}
+range_long_lat <- long_lat %>% 
+  select(latitude, longitude) %>% 
+  summary() 
+```
+
+
+**fix the code to not show Texas but, show australia instead**
+```{r}
+library(ggmap)
+# Create the bounding box for the two points
+lat <- c(-26.02, 41.35) 
+long <- c(-172.32, 167.16)
+bbox_all <- make_bbox(long, lat, f = 0.05)
+
+# Get the base map for the bounding box area
+map_location <- get_stadiamap(location = bbox_all, maptype = "stamen_terrain", source = "stamen", zoom = 10)
+
+#Filter the data by species
+filtered_data <- long_lat %>% filter(species %in% c("Amphiprion percula", "Paracanthurus hepatus"))
+
+# Plot the base map with points from df
+ggmap(map_location) +
+    geom_point(data = long_lat, aes(x = longitude, y = latitude, color = species), size = 3) +
+  scale_color_manual(values = c("orange", "blue")) +
+  labs(title = "Longitude and Latitude of Clownfish and Blue Tang") +
+  theme(legend.position = "bottom")
+```
+
+
+
+#Map the longitude and latitude of Amphiprion percula in Australia
+```{r}
+library(ggplot2)
+library(ggmap)
+
+# Filter df for the species 'Amphiprion percula' in Australia
+long_lat_australia <- long_lat[long_lat$species == 'Amphiprion percula',]
+
+# Define the bounding box for Australia
+lat_range <- c(-43.00311, -10.062805)  # Australia's approximate latitudinal range
+long_range <- c(113.6594, 153.61194)   # Australia's approximate longitudinal range
+bbox_australia <- c(left = min(long_range), bottom = min(lat_range), right = max(long_range), top = max(lat_range))
+
+# Get the base map for the bounding box area
+map_australia <- get_stadiamap(bbox = bbox_australia, maptype = "stamen_terrain", zoom = 6)
+
+# Plot the base map with points from long_lat_australia
+ggmap(map_australia) +
+  geom_point(data = long_lat_australia, aes(x = longitude, y = latitude, color = species), size = 1.5) +
+  scale_color_manual(values = c('Amphiprion percula' = "orange")) +
+  labs(title = "Distribution of Amphiprion percula in Australia") +
+  theme(legend.position = "none")
+```
+#Map the longitude and latitude of Paracanthurus hepatus
+```{r}
+library(ggplot2)
+library(ggmap)
+
+# Filter df for the species 'Paracanthurus hepatus'
+long_lat_paracanthurus <- long_lat[long_lat$species == 'Paracanthurus hepatus',]
+
+# Define the bounding box based on the min and max ranges of longitude and latitude for 'Paracanthurus hepatus'
+
+lat_range_paracanthurus <- range(long_lat_paracanthurus$latitude)
+long_range_paracanthurus <- range(long_lat_paracanthurus$longitude)
+bbox_paracanthurus <- c(left = min(long_range_paracanthurus), bottom = min(lat_range_paracanthurus), 
+                       right = max(long_range_paracanthurus), top = max(lat_range_paracanthurus))
+
+# Get the base map for the bounding box area
+map_paracanthurus <- get_stadiamap(bbox = bbox_paracanthurus, maptype = "stamen_terrain", zoom = 6)
+
+# Plot the base map with points from df_paracanthurus
+ggmap(map_paracanthurus) +
+  geom_point(data = long_lat_paracanthurus, aes(x = longitude, y = latitude), color = "blue", size = 1) +
+  labs(title = "Distribution of Paracanthurus hepatus") +
+  theme(legend.position = "none")
+```
+
+#Map that plots both species longitude and latitude and color codes them
+```{r}
+library(ggplot2)
+library(ggmap)
+
+# Define the bounding box based on the min and max ranges of longitude and latitude for both species
+lat_range <- range(long_lat$latitude)
+long_range <- range(long_lat$longitude)
+bbox_species <- c(left = min(long_range), bottom = min(lat_range), 
+                  right = max(long_range), top = max(lat_range))
+
+# Get the base map for the bounding box area
+map_species <- get_stadiamap(bbox = bbox_species, maptype = "stamen_terrain", zoom = 4)
+
+# Plot the base map with points from df for both species
+ggmap(map_species) +
+  geom_point(data = long_lat, aes(x = longitude, y = latitude, color = species), size = 1, alpha=0.7) +
+  scale_color_manual(values = c('Paracanthurus hepatus' = "blue", 'Amphiprion percula' = "orange")) +
+  labs(title = "Distribution of Species") +
+  theme(legend.position = "bottom")
+```
+```{r}
+install.packages("geosphere")
+library(geosphere)
+library(ggplot2)
+```
+-------------------------------------------------------------------------------------------------------
+**We need a data frame for the two locations to plot**
+Based on the longitude and latitude provided map the distance from Sydeny to the Great Barrier Reef  
+```{r}
+# Define the coordinates for Sydney and the Great Barrier Reef
+sydney_coords <- c(-33.8688, 151.2093)  # Sydney's latitude and longitude
+gbr_coords <- c(-18.2871, 147.6992)     # An approximate central point of the Great Barrier Reef
+
+# Filter out invalid latitude values since there is an error
+filtered_data <- long_lat %>%
+  filter(between(latitude, -90, 90))
+
+# Calculate the distance from Sydney to the Great Barrier Reef
+distance <- distHaversine(sydney_coords, gbr_coords)
+
+# Create a data frame for the two locations to plot
+locations <- long_lat(
+  name = c("Sydney", "Great Barrier Reef"),
+  latitude = c(sydney_coords[1], gbr_coords[1]),
+  longitude = c(sydney_coords[2], gbr_coords[2])
+)
+
+# Plot the map with the two points and a line representing the distance
+ggplot() +
+  geom_point(data = locations, aes(x = longitude, y = latitude, color = name), size = 4) +
+  geom_line(data = locations, aes(x = longitude, y = latitude, group = 1), color = "black", size = 1) +
+  theme_minimal() +
+  labs(title = "Distance from Sydney to the Great Barrier Reef", subtitle = paste("Distance:", round(distance / 1000, 2), "km")) +
+  scale_color_manual(values = c("Sydney" = "violetred", "Great Barrier Reef" = "gold3")) +
+  theme(legend.position = "bottom")
+```

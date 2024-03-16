@@ -1,0 +1,277 @@
+---
+title: "Fish Data Johnnie"
+author: "Johnnie Runyon"
+date: "2024-02-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+getwd()
+#setwd("C:/Users/Johnn/Desktop/BIS_015L_Project/Indiv.Markdowns")
+```
+
+### Libraries
+
+```{r}
+#install.packages("imager")
+```
+
+
+```{r}
+#install.packages("luberdate")
+
+#library(here)
+#library(shinydashboard)
+#library(shiny)
+#library(luberdate)
+library("tidyverse")
+#library("janitor")
+#library(RColorBrewer)
+#library(paletteer)
+#library(ggmap)
+#library(imager)
+```
+
+### How to present ###
+
+We want to ask if Marlin and Dory can actually make the tip to sydney from the Great Barrier Reef
+
+We will use the data frames that have these factors:
+
+In combination to details such as, the fish ridding the East Australian current, hitching a ride in a blue whale, etc.
+
+We can present the data using R,an app, and powerpoints. I suggest taking code chunks and graphs, maps, etc and inserting it into the powerpoint, as well as making the app accessable via a web ling that we can include in the powerpoint
+
+
+### Finding Nemo - Marlin's journey:
+After his son is captured in the Great Barrier Reef and taken to Sydney, a timid clownfish sets out on a journey to bring him home.
+Nemo and Marlin live in a sea anemone near the Great Barrier Reef. This is where Nemo was taken.
+
+Marlin pursues the boat
+
+
+1) bumps into Dory, a blue tang with acute short-term memory loss, who offers her help
+
+2) The two encounter Bruce, Anchor, and Chum, three sharks who have sworn to abstain from eating fish. Marlin finds a diver's mask that fell from the boat, accidentally hitting Dory. The scent of her blood sends Bruce into a frenzy and he accidentally sets off old naval mines that knock Marlin and Dory unconscious.
+
+3) Marlin and Dory wake up but the mask falls into a deep trench. Swimming after it, they are attacked by an anglerfish.
+
+4) Dory memorizes the address on the goggles before they escape. The two take directions for East Australian Current from a school of moonfish but find themselves in a forest of jellyfish.
+
+5) Stung and knocked unconscious, they awaken in the East Australian Current with a large group of sea turtles, including Crush and his son, Squirt.
+
+6) The sea turtles take Marlin and Dory to their Sydney exit, where they get lost and are consumed by a blue whale.
+
+7) The whale expels them through its blowhole into Sydney Harbour.
+
+8) A pelican named Nigel takes them to Sherman's office
+
+### Questions to consider
+
+Can a clounfish and a blue tang swim all the way from the great barrier reef to sydney?
+
+Where is sydney? - Australia *we should be specific*
+
+How far is sydney from the great barrier reef?
+
+What is the endurance of a clownfish?
+
+How fast can a clownfish swim?
+
+What type of clownfish?
+
+How soon do the fish need to reach nemo?
+
+Where do clownfish and blue tangs coexist?
+
+How would clownfish and blue tangs coexist?
+
+
+
+
+
+Where is the East Australian Current and how fast does it go? - 7km/hr
+- transports a staggering 30 million cubic metres of water southward each second at speeds of up to seven kilometres per hour. The current can be up to 100 kilometres wide and 1.5 kilometress deep.
+- about 250NM off the shorline
+
+Location of the EA current exit and sydney harbor?
+
+Blue whale speed? - Blue whales typically swim at about 5 miles an hour while they are feeding and traveling, but can accelerate to more than 20 miles an hour for short bursts.
+
+Fish Species:
+  Marlin & Nemo - "Clownfish" - Either *Amphiprion ocellaris* or Amphiprion percula.
+  *A lot of sources say ocellaris, but only based on appearence/speculation. Both these species are plausable and both should be considered*
+  Dory - "Blue tang" - Paracanthurus hepatus
+  Sharks - 
+  Whale - 
+
+
+
+*What questions could we explore in the future?*
+Survival with jellyfish?
+How likely are these fish to survive an angler fish?
+How likely are these fish to survive an encounter with sharks?
+Does gender or age play a role in swimming speed or endurance?
+Do the fish need to rest?
+
+### Sources
+
+
+*Marlin's character* (https://disney.fandom.com/wiki/Marlin#:~:text=4%20Trivia-,Background,Nemo%2C%20although%20he%20means%20well)
+
+*Marlin and Nemo's Species* (https://www.scuba.com/blog/meet-real-cast-finding-nemo/) *and* (https://www.businessinsider.com/real-facts-in-finding-nemo-pixar-movie-2019-6#scuba-divers-like-dr-sherman-who-capture-marine-life-for-sport-are-doing-a-disservice-to-these-habitats-17) *and* (https://theconversation.com/why-does-nemo-the-clownfish-have-three-white-stripes-the-riddle-solved-at-last-104176#:~:text=Nemo%2C%20alias%20Amphiprion%20ocellaris%2C%20belongs,light%2Dreflecting%20cells%20called%20iridophores.)
+
+*Nemo story wiki* (https://en.wikipedia.org/wiki/Finding_Nemo) *and* (https://disney.fandom.com/wiki/Marlin#:~:text=4%20Trivia-,Background,Nemo%2C%20although%20he%20means%20well)
+
+*East Australian Current*
+(https://theconversation.com/can-you-surf-the-east-australian-current-finding-nemo-style-27392)
+
+(https://www.abc.net.au/science/articles/2015/01/19/4164545.htm#:~:text=The%20current%20transports%20a%20staggering,the%20effects%20of%20climate%20change.)
+
+*Blue whale swim speed* (https://www.fisheries.noaa.gov/species/blue-whale)
+
+
+
+## Code
+
+*load endurance data*
+```{r}
+endurance <- read_csv("data/endurance_of_clownfish.csv")
+```
+
+*chance names to data*
+```{r}
+endurance <- data.frame(date=endurance$date, species=endurance$species, batch_id=endurance$batch_id, days_post_hatch=endurance$dph,percent_settlment_age=endurance$stand_dph, speed_in_cm_sec=endurance$speed, swim_duration_in_secconds=endurance$time_sec, dist_swam_in_cm=endurance$dist_cm, total_length=endurance$tl, standard_length=endurance$sl, body_depth=endurance$bd, propulsive_area=endurance$pa)
+```
+
+
+
+
+
+Let's look at:
+
+no current
+with current
+with current and whale
+
+summarize avg fish speed and best fish speed - when do they get to sydney?
+
+
+*Clownfish endurance data into kilometers and hours*
+```{r}
+endurance <- endurance %>%
+  filter(dist_swam_in_cm != "NA") %>%
+  select(speed_in_cm_sec, dist_swam_in_cm, swim_duration_in_secconds) %>%
+  mutate(dist_swam_in_km = dist_swam_in_cm / 100000) %>%
+  mutate(swim_duration_in_hrs = swim_duration_in_secconds / 3600) %>%
+  mutate(speed_in_km_hr = dist_swam_in_km / swim_duration_in_hrs) %>% 
+  arrange(-dist_swam_in_km) %>% 
+  arrange(-speed_in_km_hr)
+```
+
+
+*Speed in kilometers/ hour*
+```{r}
+endurance <- endurance %>% 
+  filter(speed_in_km_hr != "NaN")
+```
+
+### Calculations of journey time
+
+*Find average and fastest fish swimming speeds*
+```{r}
+mean(endurance$speed_in_km_hr)
+```
+
+```{r}
+max(endurance$speed_in_km_hr)
+```
+
+Let's look at:
+
+no current
+with current
+with current and whale
+
+Distance/speed = time Then turn time into days
+
+They swim 1,816,053.83 meters = 1,816.052 kilometers from the great barrier to sydney
+
+The current is 250 nautical miles (463 km) from the shore. This will be the distance the whale takes them.
+
+Blue whale can travel up to 32.19 km/hr
+
+```{r}
+#avg_journey_time <-  1,816.052km / 0.21888km_hr = 8,297.02 hrs / 24 = 346 days
+
+#avg_journey_time_current <- 1,816.052 / (0.21888 + 7)  = 251.57 hrs /24 = 10.5 days
+
+#avg_journey_time_current_whale <- ( 1,353.05 / (0.21888 + 7) ) + ( 463 / (0.21888 + 32.19) ) = 187.43 + 14.29 = 201.72 hrs /24 = 8.4 days
+
+#max_journey_time <-  1,816.052 / 0.360 = 5,044.58 hrs / 24 = 210 days
+
+#max_journey_time_current <-  1,816.052 / (0.360 + 7) = 246.75 hrs /24 = 10.3 days
+
+#max_journey_time_current_whale <- ((0.360 + 7) x 1,353.05) + ( 463 / (0.360 + 32.19)) = 183.84 + 14.22 = 198.06 hrs /24 = 8.3 days
+```
+
+*take data of journey time and add it to vectors*
+```{r}
+avg_journey_time <- c(346,10.5,8.4)
+
+min_journey_time <- c(210,10.3,8.3)
+
+journey <- c("days_self", "days_with_current", "days_with_current_whale")
+```
+
+
+*make data into data frame*
+```{r}
+journey <- data.frame(journey,avg_journey_time,min_journey_time)
+```
+
+```{r}
+view(journey)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
